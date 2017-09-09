@@ -1,0 +1,23 @@
+/ac-comphist.dat
+/auto-save-list
+/custom.el
+# 
+/elpa/*
+/session.*
+session.*
+/tramp
+/url/
+network-security.*
+*.html
+*.*~
+# no compiled elisp files
+*.elc
+/%backup%~
+/eshell/history
+/myinit.pdf
+/myinit.tex
+/myinit.el
+/eshell/lastdir
+/helm-doc.org
+/request/curl-cookie-jar
+/tutorial/English.tut
