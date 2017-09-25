@@ -183,6 +183,11 @@ automatically by emacs (AucTeX)
 (setq TeX-PDF-mode t)
 #+END_SRC
 
+And activate rainbow-delimiters for LaTeX code:
+#+BEGIN_SRC emacs-lisp
+(add-hook 'TeX-mode-hook #'rainbow-delimiters-mode)
+#+END_SRC
+
 
 * Helm
 
