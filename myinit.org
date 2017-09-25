@@ -331,6 +331,72 @@ headings in an org-mode file, to reduce the sizes slightly
 #+END_SRC
 
 
+** Export settings
+These settings are specifically related to exporting org-mode files to
+HTML, LaTeX etc.
+
+Note: following currently not in use. Added to header of org file
+instead, since the following doesn't work. FIXIT
+Include siunitx by default for LaTeX fragments:
+#+BEGIN_SRC emacs-lisp
+;; (setq org-format-latex-header (plist-put org-format-latex-header "\\usepackage{siunitx}"))
+#+END_SRC
+
+Set HTML export such that it can work with siunitx:
+#+BEGIN_SRC emacs-lisp
+;; modify path and mathml
+(setq org-html-mathjax-options
+  '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+    (scale "100")
+    (align "center")
+    (indent "2em")
+    (mathml t)))
+
+(setq org-html-mathjax-template
+              "
+<script type=\"text/javascript\" src=\"%PATH\"></script>
+<script type=\"text/javascript\">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        jax: [\"input/TeX\", \"output/HTML-CSS\"],
+        extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
+                     \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
+        tex2jax: {
+            inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+            displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
+            skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
+            ignoreClass: \"tex2jax_ignore\",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: \"TeX\"
+        },
+        TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
+        showProcessingMessages: true,
+        displayAlign: \"%ALIGN\",
+        displayIndent: \"%INDENT\",
+
+        \"HTML-CSS\": {
+             scale: %SCALE,
+             availableFonts: [\"STIX\",\"TeX\"],
+             preferredFont: \"TeX\",
+             webFont: \"TeX\",
+             imageFont: \"TeX\",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    \"MML\",
+                 Firefox: \"MML\",
+                 Opera:   \"HTML\",
+                 other:   \"HTML\"
+             }
+        }
+    });
+/*]]>*///-->
+</script>")
+#+END_SRC
+
+
 * Programming languages
 
 This section contains settings, which are related to different
