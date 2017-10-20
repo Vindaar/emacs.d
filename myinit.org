@@ -269,6 +269,12 @@ Increase size of latex formulas preview in org-mode
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 #+END_SRC
 
+When exporting org tables to LaTeX, we want the caption to be placed
+below the table, instead of above.
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-caption-above nil)
+#+END_SRC
+
 We want to default org-mode to the indented style.
 #+BEGIN_SRC emacs-lisp
 (setq org-startup-indented t)
