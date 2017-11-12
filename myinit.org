@@ -432,7 +432,7 @@ project. Define a function to use exuberant-tags:
   (setq local-tags-filename (concat (directory-file-name dir-name) "/TAGS"))
   ;; run shell command
   (shell-command
-   (format "ctags -f %s -e -R --verbose --fields='+afikKlmnsSzt' %s" local-tags-filename (directory-file-name dir-name)))
+   (format "%s -f %s -e -R --verbose --fields='+afikKlmnsSzt' %s" path-to-ctags local-tags-filename (directory-file-name dir-name)))
   ;; and visit the new TAGS file
   (visit-tags-table local-tags-filename)
 )
