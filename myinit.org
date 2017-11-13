@@ -170,6 +170,12 @@ Enable auto-fill-mode for every text buffer automatically.
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 #+END_SRC
 
+Set the regex builder syntax from 'read' to 'string' so that we don't
+have to use double backslash.
+#+BEGIN_SRC emacs-lisp
+(setq reb-re-syntax 'string)
+#+END_SRC
+
 
 * TeX related settings
 This part contains settings related to LaTeX. Most TeX related
