@@ -46,7 +46,9 @@ them:
                     auctex 
                     aggressive-indent 
                     ac-helm 
-                    ac-etags))
+                    ac-etags
+                    avy
+                    swiper))
 #+END_SRC
 
 Iterate over all packages and call use-package with it:
@@ -174,6 +176,25 @@ Set the regex builder syntax from 'read' to 'string' so that we don't
 have to use double backslash.
 #+BEGIN_SRC emacs-lisp
 (setq reb-re-syntax 'string)
+#+END_SRC
+
+
+Exchange isearch with swiper and set a couple of settings (taken from
+the config example https://github.com/abo-abo/swiper).
+#+BEGIN_SRC emacs-lisp
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+#+END_SRC
+
+Set some avy-mode keybindings.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-:") 'avy-goto-char)
+(global-set-key (kbd "C-'") 'avy-goto-char-2)
+(global-set-key (kbd "M-g w") 'avy-goto-word-1)
+(global-set-key (kbd "M-g e") 'avy-goto-word-0)
 #+END_SRC
 
 
