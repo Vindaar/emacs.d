@@ -291,6 +291,12 @@ current relative path given.
 (require 'org)
 #+END_SRC
 
+Disable the C-' binding for org-mode, since this conflicts with
+avy-goto-char-2
+#+BEGIN_SRC emacs-lisp
+(define-key org-mode-map (kbd "C-'") nil)
+#+END_SRC
+
 Increase size of latex formulas preview in org-mode
 #+BEGIN_SRC emacs-lisp
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
