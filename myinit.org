@@ -543,6 +543,17 @@ Set ipython as python shell
 (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
 #+END_SRC
 
+Set sane defaults for the tab width in Python mode. For some reason in
+it sometimes does not default to 4.
+#+BEGIN_SRC emacs-lisp
+
+(eval-after-load "python" `(progn
+  (add-hook 'python-mode-hook #'(lambda () 
+    (setq tab-width 4)
+    (setq python-indent-offset 4)
+    (setq python-indent-guess-indent-offset nil)))))
+#+END_SRC
+
 
 ** Clojure
 
