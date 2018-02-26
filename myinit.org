@@ -162,7 +162,12 @@ The following contains the settings related to themes.
 ;; disable menu and tool bar
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+#+END_SRC
 
+Change the default font to Inconsolata:
+#+BEGIN_SRC emacs-lisp
+(set-face-attribute 'default t :font "Inconsolata-12" )
+(set-frame-font "Inconsolata-12")
 #+END_SRC
 
 Some more general settings for some modes:
