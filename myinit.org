@@ -325,7 +325,7 @@ Load source code support for org mode for some so far used languages.
  '((emacs-lisp . t)
    (python . t)
    (C . t)
-   (sh . t)))
+   (shell . t)))
 #+END_SRC
 
 Fontify source blocks (enable syntax highlighting of source code)
