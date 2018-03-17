@@ -289,6 +289,7 @@ current relative path given.
 (global-set-key "\M-\\" 'helm-complete-file-name-at-point)
 #+END_SRC
 
+
 * Org mode
 
 
@@ -624,6 +625,7 @@ Hooks and settings for Nim lang, a sweet
 #+BEGIN_SRC emacs-lisp
 (add-hook 'nim-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'nim-mode-hook #'subword-mode)
+(add-hook 'nim-mode-hook #'nimsuggest-mode)
 #+END_SRC
 
 ** Julia
