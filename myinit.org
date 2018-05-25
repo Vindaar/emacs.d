@@ -1,5 +1,5 @@
 
-* About 
+* About
 
 This is my emacs init.el file written in org-mode. Everything in here
 is loaded by org-babel-load-file in the actual init.el, which then
@@ -17,35 +17,35 @@ them:
 (setq use-package-always-ensure t)
 
 (setq my-packages '(htmlize
-                    which-key 
-                    ob-nim 
-                    org 
-                    org-ac 
-                    ein 
-                    nim-mode 
-                    pixie-mode 
-                    undo-tree 
-                    magit 
-                    gnuplot-mode 
-                    hy-mode 
-                    smartparens 
-                    cider 
-                    clojure-mode 
-                    yasnippet 
-                    wgrep-helm 
-                    spacemacs-theme 
-                    spaceline 
-                    smart-mode-line-powerline-theme 
-                    rainbow-delimiters 
-                    monokai-theme 
-                    julia-mode 
-                    go-mode 
-                    go-autocomplete 
-                    edit-server 
-                    auto-complete-exuberant-ctags 
-                    auctex 
-                    aggressive-indent 
-                    ac-helm 
+                    which-key
+                    ob-nim
+                    org
+                    org-ac
+                    ein
+                    nim-mode
+                    pixie-mode
+                    undo-tree
+                    magit
+                    gnuplot-mode
+                    hy-mode
+                    smartparens
+                    cider
+                    clojure-mode
+                    yasnippet
+                    wgrep-helm
+                    spacemacs-theme
+                    spaceline
+                    smart-mode-line-powerline-theme
+                    rainbow-delimiters
+                    monokai-theme
+                    julia-mode
+                    go-mode
+                    go-autocomplete
+                    edit-server
+                    auto-complete-exuberant-ctags
+                    auctex
+                    aggressive-indent
+                    ac-helm
                     ac-etags
                     avy
                     swiper
@@ -54,7 +54,7 @@ them:
 
 Iterate over all packages and call use-package with it:
 #+BEGIN_SRC emacs-lisp
-(dolist (p my-packages) 
+(dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-install p)))
 #+END_SRC
@@ -209,6 +209,22 @@ horizontal split or vice versa:
 (global-set-key (kbd "C-x |") 'transpose-frame)
 #+END_SRC
 
+Add global hook to always remove trailing whitespaces in buffers upon
+saving them. Note: in some cases, e.g. Markdown this might not be
+desired, since a double whitespace at the end of a line has special
+meaning?
+Thus, define function derived from =delete-trailing-whitespace=, which
+checks for the current major mode.
+#+BEGIN_SRC emacs-lisp
+(defun delete-trailing-whitespace-no-org-mode ()
+  (when (not (eq major-mode 'org-mode)
+             delete-trailing-whitespace)))
+#+END_SRC
+Now add the custom hook.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace-no-org-mode)
+#+END_SRC
+
 ** Window splitting
 
 Change the definition of =split-window-sensibly= to prefer a vertial
@@ -216,7 +232,7 @@ over a horizontal split. Function is defined in =window.el=. Use our
 definition instead:
 #+BEGIN_SRC emacs-lisp
 (defun my-split-window-sensibly (&optional window)
-  "Custom variant of split-window-sensibly, which prefers to split the 
+  "Custom variant of split-window-sensibly, which prefers to split the
    windows vertically instead of horizontally"
   (let ((window (or window (selected-window))))
     (or (and (window-splittable-p window t)
