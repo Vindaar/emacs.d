@@ -5,7 +5,10 @@
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-(package-initialize) ;; You might already have this line
+(when (< emacs-major-version 27)
+  ;; only call package-initialize when emacs major version < 27
+  (package-initialize))
+
 
 ;; Botstrap `use-package'
 (unless (package-installed-p 'use-package)
