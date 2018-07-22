@@ -217,8 +217,8 @@ Thus, define function derived from =delete-trailing-whitespace=, which
 checks for the current major mode.
 #+BEGIN_SRC emacs-lisp
 (defun delete-trailing-whitespace-no-org-mode ()
-  (when (not (eq major-mode 'org-mode)
-             delete-trailing-whitespace)))
+  (when (not (eq major-mode 'org-mode))
+    (delete-trailing-whitespace)))
 #+END_SRC
 Now add the custom hook.
 #+BEGIN_SRC emacs-lisp
