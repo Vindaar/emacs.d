@@ -66,6 +66,9 @@ This part contains settings, which are related to the user interface,
 i.e. line numbering and also some general settings, we don't or do want.
 
 #+BEGIN_SRC emacs-lisp
+;; disable the startup screen
+(setq inhibit-startup-screen t)
+
 ;; enable line and column numbering at bottom right of buffer
 (setq line-number-mode t
       column-number-mode t)
@@ -160,9 +163,10 @@ The following contains the settings related to themes.
 
 (load-theme 'monokai t)
 
-;; disable menu and tool bar
+;; disable menu, tool bar and scroll-bar
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
 #+END_SRC
 
 Change the default font to Inconsolata:
