@@ -1,6 +1,7 @@
 
 * About
 
+
 This is my emacs init.el file written in org-mode. Everything in here
 is loaded by org-babel-load-file in the actual init.el, which then
 takes out all source blocks, creates a myinit.el file, which is executed.
@@ -49,7 +50,10 @@ them:
                     ac-etags
                     avy
                     swiper
-                    transpose-frame))
+                    transpose-frame
+                    poet-theme
+                    olivetti
+                    typo))
 #+END_SRC
 
 Iterate over all packages and call use-package with it:
@@ -547,6 +551,51 @@ needs the =shell-escape= option).
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+** Org theming
+
+Some settings for nicer looks when editing org mode. These functions need to be
+called manually to use. 
+Note: Currently this does not work perfectly yet. Switching buffers causes
+undefined behavior (e.g. font is not used and we end up with some random
+font). And unloading does not work great either yet.
+#+BEGIN_SRC emacs-lisp
+(defun load-poet-for-org ()
+  ;; Allow variable pitch mode for text mode
+  (interactive)
+  (disable-theme 'monokai)
+  (add-hook 'text-mode-hook
+             (lambda ()
+              (variable-pitch-mode 1)))
+  (set-face-attribute 'default nil :family "Iosevka" :height 130)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka")
+  (set-frame-font "Iosevka")
+  ;;(set-face-attribute 'variable-pitch nil :family "Baskerville")
+
+  (olivetti-mode 1)        ;; Centers text in the buffer
+  (olivetti-set-width 90)
+  (flyspell-mode 1)        ;; Catch Spelling mistakes
+  (typo-mode 1)            ;; Good for symbols like em-dash
+
+  ;;(blink-cursor-mode 0)    ;; Reduce visual noise
+  ;;(linum-mode 0)           ;; No line numbers for prose
+
+  (setq org-bullets-bullet-list
+        '("◉" "○"))
+  ;; (org-bullets 1)
+  (load-theme 'poet t))
+
+(defun unload-poet-for-org ()
+  (interactive)
+  (disable-theme 'poet)
+  (olivetti-mode 0)
+  (typo-mode 0)
+  (remove-hook 'text-mode-hook 'variable-pitch-mode 0)
+
+  (set-face-attribute 'default t :font "Inconsolata-12" )
+  (set-frame-font "Inconsolata-12")
+  (load-theme 'monokai t))
 #+END_SRC
 
 
