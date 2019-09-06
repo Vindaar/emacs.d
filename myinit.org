@@ -473,7 +473,7 @@ Set HTML export such that it can work with siunitx:
 #+BEGIN_SRC emacs-lisp
 ;; modify path and mathml
 (setq org-html-mathjax-options
-  '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+  '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML")
     (scale "100")
     (align "center")
     (indent "2em")
