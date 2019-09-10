@@ -111,6 +111,24 @@ i.e. line numbering and also some general settings, we don't or do want.
 
 #+END_SRC
 
+Change the keybinding for =other-window= and define a =prev-window=
+command:
+#+BEGIN_SRC emacs-lisp
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+#+END_SRC
+Unset org-cycle-agenda-files from "C-,", since we don't use it at the
+moment. Do we have to unset it both for global and local?
+#+BEGIN_SRC emacs-lisp
+(global-unset-key (kbd "C-,"))
+(local-unset-key (kbd "C-,"))
+#+END_SRC
+Then define our new keybindings for window moving:
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-.") #'other-window)
+(global-set-key (kbd "C-,") #'prev-window)
+#+END_SRC
 
 Emacs shall start an edit-server, in case none was started yet, so we
 can e.g. access emacs from Chrome (for editing text fields):
