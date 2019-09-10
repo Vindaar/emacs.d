@@ -280,6 +280,15 @@ And now choose it for the window spliting function:
 #+END_SRC
 
 
+** XMonad specific settings
+
+Set the emacs exec-path to the normal PATH variable.
+#+BEGIN_SRC emacs-lisp
+(setenv "PATH" (getenv "PATH"))
+#+END_SRC
+
+
+
 * TeX related settings
 This part contains settings related to LaTeX. Most TeX related
 settings can be found in the custom.el, because they are written
