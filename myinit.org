@@ -429,10 +429,9 @@ Define additional org mode faces
       '((sequence "TODO" "STARTED" "WAITING" "MAYBE" "DONE")))
 #+END_SRC
 
-
 Add some files to org-agenda
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files '("~/org/day_to_day.org"))
+(setq org-agenda-files '("~/org/journal.org"))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
 
