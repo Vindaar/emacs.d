@@ -245,6 +245,11 @@ And define the window moving commands
 (global-set-key (kbd "C-,") #'prev-window)
 #+END_SRC
 
+Set cycle-spacing to M-Spc to get rid of many spaces at once:
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "M-SPC") #'cycle-spacing)
+#+END_SRC
+
 ** Expansion
 
 Use =hippie-expand= for expansion by default:
