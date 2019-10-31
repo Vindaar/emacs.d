@@ -53,7 +53,8 @@ them:
                     transpose-frame
                     poet-theme
                     olivetti
-                    typo))
+                    typo
+                    mozc))
 #+END_SRC
 
 Iterate over all packages and call use-package with it:
