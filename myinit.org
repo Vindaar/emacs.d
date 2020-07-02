@@ -251,6 +251,20 @@ Set cycle-spacing to M-Spc to get rid of many spaces at once:
 (global-set-key (kbd "M-SPC") #'cycle-spacing)
 #+END_SRC
 
+Set some bindings to make move to beginning / end of buffer work with
+neo2:
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "M-–") #'beginning-of-buffer)
+(global-set-key (kbd "M-•") #'end-of-buffer)
+#+END_SRC
+
+Finally set a keybinding for =undo= to have it on the same physical
+keys:
+#+BEGIN_SRC emacs-lisp
+(bind-key* "C-j" 'undo)
+#+END_SRC
+
+
 ** Expansion
 
 Use =hippie-expand= for expansion by default:
