@@ -54,7 +54,9 @@ them:
                     poet-theme
                     olivetti
                     typo
-                    mozc))
+                    mozc
+                    web-mode ;; to program HTML templates
+))
 #+END_SRC
 
 Iterate over all packages and call use-package with it:
@@ -698,6 +700,27 @@ project. Define a function to use exuberant-tags:
 )
 #+END_SRC
 
+
+** Web mode
+
+=web-mode= is used to program HTML templates, e.g. with the go
+templating language that is used in Hugo. With the default HTML mode
+the indentation is pretty broken for all the ={{ ... }}= templating.
+
+Note: when using =web-mode= we still have to manually set the engine!
+To modify Hugo templates, we need to use the go engine:
+#+begin_src 
+M-x web-mode-set-engine ;; go
+#+end_src
+
+Set the indentation to 2 spaces.
+#+begin_src emacs-lisp
+(defun my-web-mode-hook ()
+  "Custom web-hook for 2 space indentation"
+  (setq web-mode-markup-indent-offset 2)
+)
+(add-hook 'web-mode-hook 'my-web-mode-hook)
+#+end_src
 
 ** Emacs Lisp
 
