@@ -511,6 +511,21 @@ seems correct. Weird.
 
 #+END_SRC
 
+** Flyspell-mode
+
+To get spell checking in Org (well every text buffer), we use =flyspell-mode=. Activate it
+whenever we use Org mode:
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'flyspell-mode)
+#+end_src
+
+Set up flyspell to use =aspell= and define the =--list= command to not
+be =-l= (=--lang= in aspell):
+#+begin_src emacs-lisp
+(setq ispell-program-name "/bin/aspell")
+(setq ispell-list-command "--list")
+#+end_src
+Ref: https://www.emacswiki.org/emacs/FlySpell#h5o-8
 
 ** Export settings
 These settings are specifically related to exporting org-mode files to
