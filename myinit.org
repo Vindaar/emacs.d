@@ -51,8 +51,8 @@ them:
                     avy
                     swiper
                     transpose-frame
-                    poet-theme
-                    olivetti
+                    ;; poet-theme
+                    ;; olivetti
                     typo
                     mozc
                     web-mode ;; to program HTML templates
