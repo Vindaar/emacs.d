@@ -24,11 +24,11 @@ them:
                     org-ac
                     ein
                     nim-mode
-                    pixie-mode
+                    ;; pixie-mode
                     undo-tree
                     magit
                     gnuplot-mode
-                    hy-mode
+                    ;; hy-mode
                     smartparens
                     cider
                     clojure-mode
@@ -675,7 +675,6 @@ font). And unloading does not work great either yet.
   (load-theme 'monokai t))
 #+END_SRC
 
-
 * Programming languages
 
 This section contains settings, which are related to different
@@ -887,23 +886,3 @@ which strifes for success in the scientific community.
 (add-hook 'julia-mode-hook #'subword-mode)
 #+END_SRC
 
-** Hy
-
-Some useful settings for Hy, a weird Lisp which compiles to Python
-bytecode.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'hy-mode-hook #'smartparens-strict-mode)
-(add-hook 'hy-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'hy-mode-hook #'subword-mode)
-#+END_SRC
-
-
-** Pixie
-
-Another interesting Lisp, takes Clojure as its inspiration, but tries
-to be a super compact Lisp.
-#+BEGIN_SRC emacs-lisp
-;; add REPL for pixie mode, using clojure defaults
-(add-hook 'pixie-mode-hook #'inf-clojure-minor-mode)
-#+END_SRC
