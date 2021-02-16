@@ -475,13 +475,16 @@ Define additional org mode faces
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keyword-faces
       '(
+        ("TODO" . (:foreground "#F92672" :weight bold))
         ("STARTED" . (:foreground "purple" :weight bold))
         ("WAITING" . (:foreground "yellow" :weight bold))
         ("MAYBE" . (:foreground "orange" :weight bold))
+        ("WONTFIX" . (:foreground "wheat" :weight bold))
+        ("DONE" . (:foreground "#A6E22E" :weight bold))
         ))
 
 (setq org-todo-keywords
-      '((sequence "TODO" "STARTED" "WAITING" "MAYBE" "DONE")))
+      '((sequence "TODO" "STARTED" "WAITING" "MAYBE" "|" "DONE" "WONTFIX")))
 #+END_SRC
 
 Add some files to org-agenda
