@@ -366,7 +366,7 @@ Changed to "C-c h". Note: We must set "C-c h" globally, because we
 cannot change `helm-command-prefix-key' once `helm-config' is loaded.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c h") 'helm-command-prefix)
-; (global-unset-key (kbd "C-x c")
+;; (global-unset-key (kbd "C-x c"))
 ;; instead of using standard M-x, use helm-M-x instead
 (global-set-key (kbd "M-x") 'helm-M-x)
 ;; instead of using standard kill ring, use helm show kill ring
