@@ -62,8 +62,11 @@ them:
 Iterate over all packages and call use-package with it:
 #+BEGIN_SRC emacs-lisp
 (dolist (p my-packages)
-  (when (not (package-installed-p p))
-    (package-install p)))
+  (if (not (package-installed-p p))
+    (progn 
+      (message "Installing %s" p)
+      (package-install p))
+    (message "Already installed %s" p)))
 #+END_SRC
 
 
