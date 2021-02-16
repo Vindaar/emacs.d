@@ -536,6 +536,22 @@ be =-l= (=--lang= in aspell):
 #+end_src
 Ref: https://www.emacswiki.org/emacs/FlySpell#h5o-8
 
+Rebind the auto correct and next error bindings for =flyspell-mode=,
+since they collide with our change buffer window key bindings.
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook
+          (lambda ()
+            (flyspell-mode)
+            (define-key flyspell-mode-map (kbd "C-.") nil)
+            (define-key flyspell-mode-map (kbd "C-,") nil)
+            ;; (define-key flyspell-map (kbd "C-.") 'flyspell-auto-correct-word)
+            ;; (define-key flyspell-map (kbd "C-,") 'flyspell-goto-next-error)
+            )
+          )
+#+end_src
+
+
 ** Export settings
 These settings are specifically related to exporting org-mode files to
 HTML, LaTeX etc.
