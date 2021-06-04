@@ -351,6 +351,15 @@ And activate rainbow-delimiters for LaTeX code:
 (add-hook 'TeX-mode-hook #'rainbow-delimiters-mode)
 #+END_SRC
 
+Use =xelatex= by default:
+#+begin_src emacs-lisp
+(setq-default TeX-engine 'xetex)
+#+end_src
+
+And make sure ghostscript path is correct:
+#+begin_src emacs-lisp
+(setq preview-gs-command "/bin/gs")
+#+end_src
 
 * Helm
 
