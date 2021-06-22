@@ -294,14 +294,14 @@ definition instead:
    windows vertically instead of horizontally"
   (let ((window (or window (selected-window))))
     (or (and (window-splittable-p window t)
-	     ;; Split window vertically.
-	     (with-selected-window window
+             ;; Split window vertically.
+             (with-selected-window window
            (split-window-right)))
-	(and (window-splittable-p window)
-	     ;; Split window horizontally.
-	     (with-selected-window window
-	       (split-window-below)))
-	(and
+        (and (window-splittable-p window)
+             ;; Split window horizontally.
+             (with-selected-window window
+               (split-window-below)))
+        (and
          ;; If WINDOW is the only usable window on its frame (it is
          ;; the only one or, not being the only one, all the other
          ;; ones are dedicated) and is not the minibuffer window, try
@@ -317,11 +317,11 @@ definition instead:
                                     (throw 'done nil)))
                                 frame)
               t)))
-	 (not (window-minibuffer-p window))
-	 (let ((split-height-threshold 0))
-	   (when (window-splittable-p window)
-	     (with-selected-window window
-	       (split-window-below))))))))
+         (not (window-minibuffer-p window))
+         (let ((split-height-threshold 0))
+           (when (window-splittable-p window)
+             (with-selected-window window
+               (split-window-below))))))))
 #+END_SRC
 
 And now choose it for the window spliting function:
@@ -805,6 +805,7 @@ spaces.
 #+BEGIN_SRC emacs-lisp
 (setq c-default-style "python"
        c-basic-offset 4
+       indent-tabs-mode nil
        tab-width 4)
 ;; indent cases to the same level as c-indent-level
 (c-set-offset 'case-label '+)
