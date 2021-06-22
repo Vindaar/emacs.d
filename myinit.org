@@ -20,8 +20,8 @@ them:
 (setq my-packages '(htmlize
                     which-key
                     ob-nim
-                    org
-                    org-ac
+                    ;;org
+                    ;;org-ac
                     ein
                     nim-mode
                     ;; pixie-mode
@@ -57,6 +57,7 @@ them:
                     mozc
                     web-mode ;; to program HTML templates
                     yaml-mode
+                    xah-math-mode
 ))
 #+END_SRC
 
@@ -270,6 +271,10 @@ keys:
 (bind-key* "C-j" 'undo)
 #+END_SRC
 
+Activate =xah-math-mode= globally:
+#+begin_src emacs-lisp
+(global-xah-math-input-mode 1)
+#+end_src
 
 ** Expansion
 
