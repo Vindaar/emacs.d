@@ -273,7 +273,7 @@ keys:
 
 Activate =xah-math-mode= globally:
 #+begin_src emacs-lisp
-(global-xah-math-input-mode 1)
+(global-xah-math-input-mode nil)
 #+end_src
 
 ** Expansion
