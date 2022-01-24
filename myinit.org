@@ -271,9 +271,12 @@ keys:
 (bind-key* "C-j" 'undo)
 #+END_SRC
 
-Activate =xah-math-mode= globally:
+Activate =xah-math-mode= globally and change it's default key binding:
 #+begin_src emacs-lisp
-(global-xah-math-input-mode nil)
+(require 'xah-math-input)
+(global-xah-math-input-mode 1)
+(define-key xah-math-input-keymap (kbd "S-SPC") nil) ; unset Shift+space 
+(define-key xah-math-input-keymap (kbd "s-i") 'xah-math-input-change-to-symbol)
 #+end_src
 
 ** Expansion
