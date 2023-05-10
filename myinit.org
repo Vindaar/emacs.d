@@ -282,6 +282,7 @@ Activate =xah-math-mode= globally and change it's default key binding:
 ;; (global-xah-math-input-mode 1)
 ;; (define-key xah-math-input-keymap (kbd "S-SPC") nil) ; unset Shift+space 
 ;; (define-key xah-math-input-keymap (kbd "s-i") 'xah-math-input-change-to-symbol)
+;;(global-xah-math-input-mode nil)
 #+end_src
 
 Smooth scrolling from emacs 29.1!
@@ -304,6 +305,12 @@ https://stackoverflow.com/questions/28202546/hitting-ctrl-z-in-emacs-freezes-eve
 
 (global-unset-key (kbd "C-z"))
 (global-set-key (kbd "C-z") 'my-suspend-frame)
+#+end_src
+
+Enable yanking of the PRIMARY buffer via the middle mouse button in
+~emacs~calc~ (i.e. to copy via mark and paste into calc!)
+#+begin_src emacs-lisp
+(setq select-enable-primary t)
 #+end_src
 
 ** Expansion
