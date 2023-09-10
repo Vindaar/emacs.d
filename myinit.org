@@ -412,7 +412,7 @@ https://tuhdo.github.io/helm-intro.html
 
 #+BEGIN_SRC emacs-lisp
 (require 'helm)
-(require 'helm-config)
+;;(require 'helm-config)
 #+END_SRC
 
 The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
