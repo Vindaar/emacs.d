@@ -284,6 +284,23 @@ Smooth scrolling from emacs 29.1!
 (pixel-scroll-precision-mode t)
 #+end_src
 
+Disable the behavior of ~C-z~. Ever since switching to the neo layout
+I hit C-z way too often (next to p!). This seems like an elegant
+solution:
+
+https://stackoverflow.com/questions/28202546/hitting-ctrl-z-in-emacs-freezes-everything
+#+begin_src emacs-lisp
+(defun my-suspend-frame ()
+  "In a GUI environment, do nothing; otherwise `suspend-frame'."
+  (interactive)
+  (if (display-graphic-p)
+      (message "suspend-frame disabled for graphical displays.")
+    (suspend-frame)))
+
+(global-unset-key (kbd "C-z"))
+(global-set-key (kbd "C-z") 'my-suspend-frame)
+#+end_src
+
 ** Expansion
 
 Use =hippie-expand= for expansion by default:
