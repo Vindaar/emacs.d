@@ -57,8 +57,8 @@ them:
                     mozc
                     web-mode ;; to program HTML templates
                     yaml-mode
-                    xah-math-input
-))
+                    ;;xah-math-input
+                    ))
 #+END_SRC
 
 Iterate over all packages and call use-package with it:
