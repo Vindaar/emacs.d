@@ -278,6 +278,10 @@ Activate =xah-math-mode= globally and change it's default key binding:
 ;; (define-key xah-math-input-keymap (kbd "S-SPC") nil) ; unset Shift+space 
 ;; (define-key xah-math-input-keymap (kbd "s-i") 'xah-math-input-change-to-symbol)
 #+end_src
+
+Smooth scrolling from emacs 29.1!
+#+begin_src emacs-lisp
+(pixel-scroll-precision-mode t)
 #+end_src
 
 ** Expansion
