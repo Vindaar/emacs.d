@@ -700,6 +700,59 @@ This works now. Important points:
 </script>")
 #+END_SRC
 
+
+The following *WOULD* be some code to use MathJax 3, but *uhhhh* there
+is no siunitx for that. So screw that!
+#+BEGIN_SRC emacs-lisp :exports none
+;; modify path and mathml
+(setq org-html-mathjax-options
+    '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/core.min.js")
+    (scale "100")
+    (align "center")
+    (indent "2em")
+    (mathml t)))
+
+(setq org-html-mathjax-template
+              "
+<script type='text/javascript' id='MathJax-script' async src='%PATH%/tex-chtml.js'></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]'], ['\\begin{displaymath}', '\\end{displaymath}']],
+    processEscapes: false,
+    packages: { '[+]': ['noerrors'] }, // This is just an example, adjust based on needed extensions
+    tags: 'ams', // If you want AMS-style equation numbering
+    macros: {
+      // For any additional macros you want to define, like:
+      // mymacro: ['{\\frac{#1}{#2}}', 2]
+    }
+  },
+  loader: {
+    load: ['[tex]/noerrors'] // This is just an example, adjust based on needed extensions
+  },
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process',
+    displayAlign: '%ALIGN', // Adjust with your preference
+    displayIndent: '%INDENT' // Adjust with your preference
+  },
+  startup: {
+    typeset: true
+  },
+  chtml: {
+    scale: %SCALE,
+    fontURL: '%PATH%/fonts/woff-v2', // Adjust with your font path
+    displayAlign: '%ALIGN', // Adjust with your preference
+    displayIndent: '%INDENT' // Adjust with your preference
+  }
+};
+</script>
+")
+#+END_SRC
+
+
+
 Use the minted package to export org-babel code blocks. Also add some
 options to print line numbers and use the monokai background color, if
 defined. The monokai_bg color used here is (taken from an Org talk):
