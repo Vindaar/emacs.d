@@ -634,6 +634,17 @@ Include siunitx by default for LaTeX fragments:
 #+END_SRC
 
 Set HTML export such that it can work with siunitx:
+    
+Old code for MathJax version 2:
+
+This works now. Important points:
+- the script type should be ~text/x-mathjax-config~ for the MathJax
+  configuration!
+- The ~siunitx~ package can be / should be included by
+  ~[Contrib]/siunitx/siunitx.js~
+- the ~siunitx.js~ file is *NOT NEEDED* for whatever reason
+- we also added line numbering via the ~TeX~ ~equationNumbers~ entry
+  using amsmath logic.  
 #+BEGIN_SRC emacs-lisp
 ;; modify path and mathml
 (setq org-html-mathjax-options
@@ -646,7 +657,7 @@ Set HTML export such that it can work with siunitx:
 (setq org-html-mathjax-template
               "
 <script type=\"text/javascript\" src=\"%PATH\"></script>
-<script type=\"text/javascript\">
+<script type=\"text/x-mathjax-config\">
 <!--/*--><![CDATA[/*><!--*/
     MathJax.Hub.Config({
         jax: [\"input/TeX\", \"output/HTML-CSS\"],
@@ -661,7 +672,6 @@ Set HTML export such that it can work with siunitx:
             processEnvironments: true,
             preview: \"TeX\"
         },
-        TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
         showProcessingMessages: true,
         displayAlign: \"%ALIGN\",
         displayIndent: \"%INDENT\",
@@ -681,6 +691,9 @@ Set HTML export such that it can work with siunitx:
                  Opera:   \"HTML\",
                  other:   \"HTML\"
              }
+        },
+        TeX: {
+              equationNumbers: { autoNumber: 'AMS' }
         }
     });
 /*]]>*///-->
