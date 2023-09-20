@@ -58,6 +58,8 @@ them:
                     web-mode ;; to program HTML templates
                     yaml-mode
                     ;;xah-math-input
+                    org-ref
+                    helm-bibtex
                     ))
 #+END_SRC
 
@@ -496,6 +498,9 @@ current relative path given.
 
 #+BEGIN_SRC emacs-lisp
 (require 'org)
+(require 'org-ref)
+(require 'org-ref-helm)
+(require 'doi-utils)
 #+END_SRC
 
 Disable the =C-'= binding for org-mode, since this conflicts with
