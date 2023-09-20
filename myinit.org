@@ -638,6 +638,8 @@ Include siunitx by default for LaTeX fragments:
 ;; (setq org-format-latex-header (plist-put org-format-latex-header "\\usepackage{siunitx}"))
 #+END_SRC
 
+**** MathJax setup
+
 Set HTML export such that it can work with siunitx:
     
 Old code for MathJax version 2:
@@ -649,18 +651,19 @@ This works now. Important points:
   ~[Contrib]/siunitx/siunitx.js~
 - the ~siunitx.js~ file is *NOT NEEDED* for whatever reason
 - we also added line numbering via the ~TeX~ ~equationNumbers~ entry
-  using amsmath logic.  
+  using amsmath logic.
+- enabled inline math via single ~$foo$~ 
 #+BEGIN_SRC emacs-lisp
 ;; modify path and mathml
 (setq org-html-mathjax-options
-  '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML")
-    (scale "100")
-    (align "center")
-    (indent "2em")
-    (mathml t)))
+      '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML")
+        (scale "100")
+        (align "center")
+        (indent "2em")
+        (mathml t)))
 
 (setq org-html-mathjax-template
-              "
+      "
 <script type=\"text/javascript\" src=\"%PATH\"></script>
 <script type=\"text/x-mathjax-config\">
 <!--/*--><![CDATA[/*><!--*/
@@ -669,7 +672,7 @@ This works now. Important points:
         extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
                      \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
         tex2jax: {
-            inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+            inlineMath: [ [\"\\\\(\",\"\\\\)\"], ['$', '$'], ],
             displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
             skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
             ignoreClass: \"tex2jax_ignore\",
@@ -702,22 +705,24 @@ This works now. Important points:
         }
     });
 /*]]>*///-->
-</script>")
+</script>
+")
 #+END_SRC
+
 
 
 The following *WOULD* be some code to use MathJax 3, but *uhhhh* there
 is no siunitx for that. So screw that!
 #+BEGIN_SRC emacs-lisp :exports none
 ;; modify path and mathml
-(setq org-html-mathjax-options
+(setq org-html-mathjax-options-v3
     '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/core.min.js")
     (scale "100")
     (align "center")
     (indent "2em")
     (mathml t)))
 
-(setq org-html-mathjax-template
+(setq org-html-mathjax-template-v3
               "
 <script type='text/javascript' id='MathJax-script' async src='%PATH%/tex-chtml.js'></script>
 <script>
