@@ -701,7 +701,17 @@ This works now. Important points:
              }
         },
         TeX: {
-              equationNumbers: { autoNumber: 'AMS' }
+              equationNumbers: { autoNumber: 'AMS' },
+              Macros: {
+                  ccsini: '{\\\\mathrm{Si}₃\\\\mathrm{N}₄}',
+                  cefe: '{\\\\ce{^{55}Fe}}',
+                  vektor: ['{\\\\begin{pmatrix}#1\\\\end{pmatrix}}', 1],
+                  mtrix: ['{\\\\begin{pmatrix}#1\\\\end{pmatrix}}', 1],
+                  cp: '{\\\\mathrm{CP}}',
+                  cpt: '{\\\\mathrm{CPT}}',
+                  dd: '{\\\\mathop{}\\\\!{\\\\mathrm{d}}}',
+                  sinc: '{\\\\mathrm{sinc}}'
+              }
         }
     });
 /*]]>*///-->
