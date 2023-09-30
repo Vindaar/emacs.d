@@ -738,6 +738,12 @@ and needs to be included in the Org file using
 #+SETUPFILE: ~/.emacs.d/default_latex_header.org
 #+end_example
 
+
+*** HTML export
+:PROPERTIES:
+:CUSTOM_ID: sec:html_export
+:END:
+
 Note: following currently not in use. Added to header of org file
 instead, since the following doesn't work. FIXIT
 Include siunitx by default for LaTeX fragments:
