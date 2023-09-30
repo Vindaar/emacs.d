@@ -1012,6 +1012,305 @@ processing hooks that run before the actual export:
 
 
 
+*** Subfigure DSL 
+
+Setup our custom ~subfigure~ as an emacs-lisp code block, make
+~subfigure~ blocks behave like emacs-lisp blocks:
+#+begin_src emacs-lisp
+(add-to-list 'org-src-lang-modes '("subfigure" . emacs-lisp))
+#+end_src
+
+Development notes here
+[[file:~/org/Misc/side_by_side_subfigure_elisp_dsl.org]].
+
+The DSL works by converting to the required code to generate a
+side-by-side figure on the specific backend. The ~subfigure~ code
+present in the buffer will be fully replaced by the resulting code.
+
+For the HTML backend, we need to be a bit more careful with respect to
+the figure numbering. We need to use the HTML5 option for Org and tell
+it to keep our own figure labels. More on that below.
+
+
+Define the heart of the DSL, i.e. applying it on the elements in the
+Org file that are source code blocks of the 'subfigure' language and
+mapping the symbols from their backend specific versions to the
+symbols used in the DSL:
+#+begin_src emacs-lisp
+(defun apply-subfigure-dsl ()
+  "Performs the actual application of the subfigure DSL, by mapping over
+all Org source code blocks, checking if they are `subfigure` blocks and
+if so evaluating their body."
+  (let (subfigures)
+    (org-element-map (org-element-parse-buffer) 'src-block ;; collect all subfigure blocks
+      (lambda (src-block)
+        (when (string= (org-element-property :language src-block) "subfigure")
+          (push src-block subfigures))))
+    (dolist (src-block subfigures) ;; process each subfigure block
+      (let* ((begin (org-element-property :begin src-block))
+             (end   (org-element-property :end src-block))
+             (contents (org-element-property :value src-block))
+             (result (eval (read contents))))
+        (goto-char begin)
+        (delete-region begin end)
+        (insert result)))))
+;; 
+;; (defun apply-subfigure-dsl ()
+;;   "Performs the actual application of the subfigure DSL, by mapping over
+;; all Org source code blocks, checking if they are `subfigure` blocks and
+;; if so evaluating their body."
+;;   (org-element-map (org-element-parse-buffer) 'src-block ;; map all source blocks
+;;     (lambda (src-block)                                  ;; with this lambda
+;;       (when (string= (org-element-property :language src-block) "subfigure") ;; if block language is subfigure...
+;;         (let* ((begin (org-element-property :begin src-block))
+;;                (end   (org-element-property :end src-block))
+;;                (contents (org-element-property :value src-block))
+;;                (result (eval (read contents))))
+;;           (goto-char begin)
+;;           (delete-region begin end)
+;;           (insert result))))))
+
+(defun my/org-process-subfigure-dsl (backend)
+  "Processes `subfigure` Org source code blocks, which contain our subfigure DSL.
+This DSL generates different code for the LaTeX and HTML backends to produce side by side
+figures"
+  (cond
+   ((eq backend 'latex)
+    ;; cl-letf ;; bind backend specific functions!
+    (cl-letf (((symbol-function 'label) 'label-latex)
+              ((symbol-function 'ref) 'ref-latex)
+              ((symbol-function 'caption) 'caption-latex)
+              ((symbol-function 'includegraphics) 'includegraphics-latex)
+              ((symbol-function 'subfigure) 'subfigure-latex)
+              ((symbol-function 'figure) 'figure-latex)
+              ((symbol-function 'enskip) 'enskip-latex)
+              ((symbol-function 'linewidth) 'linewidth-latex)
+              ((symbol-function '$) '$-latex)
+              ((symbol-function 'subref) 'subref-latex)
+              ((symbol-function 'cite) 'cite-latex))
+      (apply-subfigure-dsl)))
+   ((eq backend 'html)
+    (cl-letf (((symbol-function 'label) 'label-html)
+              ((symbol-function 'ref) 'ref-html)
+              ((symbol-function 'caption) 'caption-html)
+              ((symbol-function 'includegraphics) 'includegraphics-html)
+              ((symbol-function 'subfigure) 'subfigure-html)
+              ((symbol-function 'figure) 'figure-html)
+              ((symbol-function 'enskip) 'enskip-html)
+              ((symbol-function 'linewidth) 'linewidth-html)
+              ((symbol-function '$) '$-html)
+              ((symbol-function 'subref) 'subref-html)              
+              ((symbol-function 'cite) 'cite-html))
+      (apply-subfigure-dsl)))
+   ))
+#+end_src
+
+And now apply that hook also to the list of Org preprocessing hooks:
+#+begin_src emacs-lisp
+;; Need to think about which order to apply this hook relative to the other
+;; HTML hook that converts PDFs to SVG!
+(add-hook 'org-export-before-processing-hook 'my/org-process-subfigure-dsl)
+;(remove-hook 'org-export-before-processing-hook 'my/org-process-subfigure-dsl)
+#+end_src
+
+
+A short helper:
+#+begin_src emacs-lisp
+(defun process-args-to-plist (args)
+  "Converts the given arguments containing plists into a single plist 
+where potential duplicate keys in args are mapped to a single key. Each
+key in the resulting plist has a regular list as its argument."
+  (let ((plist '()))
+    ;; Loop through evaluated args
+    (dolist (res args) 
+      (let* ((key (car res))          ; Extract the property name
+             (current (plist-get plist key)))  ; Current list for the key
+        ;; If the key already exists, append. Otherwise, create a new list.
+        (if current
+            (plist-put plist key (append current (cdr res)))
+          (setq plist (plist-put plist key (cdr res))))))
+    plist))
+#+end_src
+
+
+DSL commands for the LaTeX backend:
+#+BEGIN_SRC emacs-lisp
+(defun label-latex (arg)
+  (list :label (format "\\label{%s}" arg)))
+
+(defun ref-latex (arg)
+  (format "\\ref{%s}" arg))
+
+(defun caption-latex (&rest body)
+  (list :caption (format "\\caption{%s}"
+	                 (mapconcat 'eval body ""))))
+
+(defun includegraphics-latex (options path)
+  (format "\\includegraphics%s{%s}"
+	  (if options
+	      (format "[%s]"
+		      (mapconcat (lambda (ccell)
+				   (format "%s=%s"
+					   (car ccell)
+					   (cdr ccell)))
+				 options
+				 ","))
+	    "")
+	  path))
+
+(defun subfigure-latex (width caption label body)
+  (message "Is it true? %s " (string-prefix-p "\\caption" caption))
+  (message "Caption is: %s " caption)
+  (unless (plist-get caption :caption)
+    (error "Expected a caption of the form \\caption{foo}, got %s" caption))
+  (unless (plist-get label :label)
+    (error "Expected a label of the form \\label{foo}, got %s" label))
+  (list :subfigure (format "\\begin{subfigure}{%s}
+  %s
+  %s
+  %s
+\\end{subfigure}%%"
+                           width body (plist-get caption :caption) (plist-get label :label))))
+
+(defun figure-latex (options &rest body)
+  (message "%s" (process-args-to-plist body))
+  (let* ((fig-body (process-args-to-plist body))
+         (label (plist-get fig-body :label))
+         (caption (plist-get fig-body :caption))
+         (figs (plist-get fig-body :subfigure)))
+    (message "LABEL %s CAPTION %s FIGS %s" label caption figs)
+    (format "\\begin{figure}[htbp]
+%s
+%s
+%s
+\\end{figure}\n\n"
+            (string-join figs "\n") (string-join caption " ") (string-join label " "))))
+;; (mapconcat 'eval body "\n")))
+
+(defun enskip-latex () "\\enskip")
+
+(defun linewidth-latex (size)
+  (format "%s\\linewidth" size))
+
+(defun num (arg)
+  (format "\\num{%s}" arg))
+
+(defun SI (value unit)
+  (format "\\SI{%s}{%s}" value unit))
+
+(defun $-latex (&rest arg)
+  (format "$%s$" (apply 'concat arg)))
+
+(defun subref-latex (arg)
+  (format "\\subref{%s}" arg))
+
+(defun cite-latex (arg)
+  (format "\\cite{%s}" arg))
+#+END_SRC
+
+And for HTML (unfinished + we still need to rename the functions!)
+#+begin_src emacs-lisp
+(defun label-html (arg)
+  (list :label (format "%s" arg)))
+;;  (format "<a name=\"%s\"></a>" arg))
+
+(defun ref-html (arg)
+  (format "<a href=\"#%s\"></a>" arg))
+
+(defun caption-html (&rest body)
+  (list :caption (format "<figcaption>%s</figcaption>"
+	                 (mapconcat 'eval body ""))))
+
+(defun includegraphics-html (options path)
+  ;; 1. perform replacement of the actual file we insert
+  (unless (listp options)
+    (error "Expected a list as the first argument, but got '%s'" options))
+  (message "Looking at '%s' with options '%s'" path (mapconcat #'prin1-to-string options ", "))
+  (message "Last link '%s'" (last options))
+  (let ((new-file (perform-replacement path)))
+    (message "Got file '%s' after replace" new-file)
+    (format "<img src=\"%s\" %s >" ;; for now ignore size
+	                 new-file (cdr (car options)))))
+
+(defun subfigure-html (width caption label body)
+  (list :subfigure (format "<figure class=\"subfigure\" id=\"%s\" %s>%s%s</figure>"
+                           (plist-get label :label) width body (plist-get caption :caption))))
+;;	  (mapconcat 'eval body "")))
+;;	  (when options
+;;	    (concat "<br>"
+;;		    (mapconcat 'eval options "")))))
+
+(defun figure-html (options &rest body)
+  ;; process the inputs
+  (message "%s" (process-args-to-plist body))
+  (let* ((fig-body (process-args-to-plist body))  ;;(process-args-to-plist 'body)
+         (label (plist-get fig-body :label))
+         (caption (plist-get fig-body :caption))
+         (figs (plist-get fig-body :subfigure)))
+    (message "LABEL %s CAPTION %s FIGS %s" label caption figs)
+    (format "\n#+BEGIN_EXPORT HTML
+<figure class=\"figure-wrapper\" id=\"%s\">
+%s
+%s
+</figure>
+,#+END_EXPORT\n\n" (string-join label "\n") (string-join figs " ") (string-join caption " "))))
+          ;;label (cl-map 'eval body "\n")))
+
+(defun enskip-html () "")
+
+;; Think about what to do with line width
+(defun linewidth-html (size)
+  (unless (numberp size)
+    (error "Expected a size as a number, but got %s" size))
+  (format "data-width=\"%d%%\"" (- (* size 100) 1)))
+;  (format "data-width=\"%d%%\"" (* size 100)))
+  
+
+(defun SI (value unit)
+  (format "\\SI{%s}{%s}" value unit))
+
+(defun $-html (&rest arg)
+  (format "$%s$" (apply 'concat arg)))
+
+(defun subref-html (arg)
+  (ref-html arg))
+
+(defun cite-html (arg)
+  (format "\\cite{%s}" arg))
+#+end_src
+
+#+RESULTS:
+: subref-html
+
+Finally deal with linking to the ~subfigure~ references: We define a
+custom link type ~sref~, which handles our custom ~subfigure~
+references correctly. That means on the LaTeX backend it inserts a
+~\ref~ (or ~\subref~) while on the HTML backend it uses the identifier
+and prepends a ~#~ to make it a file local link.
+#+begin_src emacs-lisp
+(org-link-set-parameters "sref"
+                         :follow (lambda (path) (org-open-link-from-string (format "[[ref:%s]]" path)))
+                         :help-echo "Click to follow link."
+                         :export (lambda (path desc format)
+                                   (cond
+                                    ((eq format 'latex)
+                                     (format "\\ref{%s}" path))
+                                    ((eq format 'html)
+                                     (format "<a href=\"#%s\">#%s</a>" path (or desc path)))
+                                    (t path))))
+(org-link-set-parameters "s-subref"
+                         :follow (lambda (path) (org-open-link-from-string (format "[[ref:%s]]" path)))
+                         :help-echo "Click to follow link."
+                         :export (lambda (path desc format)
+                                   (cond
+                                    ((eq format 'latex)
+                                     (format "\\subref{%s}" path))
+                                    ((eq format 'html)
+                                     (format "<a href=\"#%s\">#%s</a>" path (or desc path)))
+                                    (t path))))
+#+end_src
+
+
 ** Org theming
 
 Some settings for nicer looks when editing org mode. These functions need to be
