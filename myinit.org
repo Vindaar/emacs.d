@@ -726,7 +726,7 @@ and to get minted to use the monokai theme, simply add:
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 (setq org-latex-minted-options
-   '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg")))
+   '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg") ("fontsize=\\footnotesize")))
 #+END_SRC
 
 Now define pdflatex compilation commands used when =C-c C-e l P= is
