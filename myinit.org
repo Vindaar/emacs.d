@@ -884,37 +884,133 @@ window.MathJax = {
 ")
 #+END_SRC
 
+**** Automatic conversion of PDFs to SVGs
+
+Automate the conversion of PDFs to SVGs as a step in the export to
+HTML. I might have used [[https://chat.openai.com/share/debb3964-cbfb-497f-bac8-829622f35172][GPT4 in the process a bit]]! 
+#+begin_src emacs-lisp
+;; (defun my/org-pdf-to-svg (backend)
+;;   "Convert PDF images to SVG in Org buffer for HTML export."
+;;   (when (eq backend 'html) ; Only process for HTML export
+;;     (goto-char (point-min))
+;;     (while (re-search-forward "\\[\\[\\(.*?\\)\\.pdf\\]\\]" nil t)
+;;       (let ((pdf-file (match-string 1))
+;;             (svg-file))
+;;         (setq svg-file (concat pdf-file ".svg"))
+;;         (unless (file-exists-p svg-file)
+;;           (shell-command (format "inkscape -o %s %s.pdf" svg-file pdf-file)))
+;;         (replace-match (format "[[%s.svg]]" pdf-file) nil t)))))
+;;(while (re-search-forward "\\[\\[\\(.*?\\)\\.\\(.*?\\)\\]\\]" nil t)
+;;(while (re-search-forward "\\[\\[\\(.*\\)\\.\\([^\\.]+\\)\\]\\]" nil t)
+;; (defun my/org-html-export-figs-old (backend)  
+;;   "Convert PDF images to SVG in Org buffer for HTML export,
+;; and replace absolute paths with relative ones pointing to './figs/'.
+;; Further copy all other figures (PNG, ...) to the same './figs/' dir"
+;;   (when (eq backend 'html) ; Only process for HTML export
+;;     (goto-char (point-min))
+;;     (let* ((figs-dir "./figs/"))
+;;       (unless (file-exists-p figs-dir)
+;;         (make-directory figs-dir))
+;;       (while (re-search-forward "\\[\\[\\(.*?\\)\\.\\([^\\.]+\\)\\]\\]" nil t)
+;;         (let* ((absolute-path (match-string 1))
+;;                (extension (match-string 2)))
+;;           (if (and absolute-path extension 
+;;                    (not (string-empty-p absolute-path))
+;;                    (not (string-empty-p extension)))
+;;               (progn
+;;                 (let* ((filename (file-name-nondirectory absolute-path))
+;;                        (new-file (perform-replacement filename relative-path absolute-path))
+;;                        (relative-path (concat figs-dir filename))
+;;                        (new-file (cond
+;;                                   ((string-equal "pdf" extension) (convert-pdf-to-svg relative-path absolute-path))
+;;                                   ((member extension '("png" "jpg" "jpeg")) (copy-file-to-figs-dir absolute-path relative-path extension))
+;;                                   (t (concat absolute-path "." extension)))))
+;;                   (message (format "Match of path %s and match of extension %s for input" absolute-path extension))
+;;                   (message (format "Handling %s of extension '%s' is equal to pdf? %s" new-file extension (string-equal "pdf" extension)))
+;;                   (replace-match (format "[[%s]]" new-file) nil t)))))))))
 
 
-Use the minted package to export org-babel code blocks. Also add some
-options to print line numbers and use the monokai background color, if
-defined. The monokai_bg color used here is (taken from an Org talk):
-#+BEGIN_EXAMPLE
-#+LATEX_HEADER: \definecolor{monokai_bg}{RGB}{39, 40, 34}
-#+END_EXAMPLE
-and to get minted to use the monokai theme, simply add:
-#+BEGIN_EXAMPLE
-#+LaTeX_HEADER: \usemintedstyle{monokai}
-#+END_EXAMPLE
+(defun my/org-pdf-to-svg (backend)
+  "Convert PDF images to SVG in Org buffer for HTML export,
+and replace absolute paths with relative ones pointing to './figs/'."
+  (when (eq backend 'html) ; Only process for HTML export
+    (goto-char (point-min))
+    (let* ((figs-dir "./figs/"))
+      (unless (file-exists-p figs-dir)
+        (make-directory figs-dir))
+      (while (re-search-forward "\\[\\[\\(.*?\\)\\.pdf\\]\\]" nil t)
+        (let* ((absolute-path (match-string 1))
+               (filename (file-name-nondirectory absolute-path))
+               (relative-path (concat figs-dir filename))
+               (svg-file (concat (file-name-sans-extension relative-path) ".svg")))
+          (unless (file-exists-p svg-file)
+            (shell-command (format "inkscape -o %s %s.pdf" svg-file absolute-path)))
+          (replace-match (format "[[%s]]" svg-file) nil t))))))
 
-#+BEGIN_SRC emacs-lisp
-(require 'ox-latex)
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq org-latex-listings 'minted)
-(setq org-latex-minted-options
-   '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg")))
-#+END_SRC
+(defun convert-pdf-to-svg (relative-path absolute-path)
+  "Converts the given file.pdf (relative-path contains the `.pdf` suffix) to file.svg and places the SVG in path"
+  (let* ((svg-file (concat (file-name-sans-extension relative-path) ".svg")))
+    (message (format "Converting %s to %s" absolute-path svg-file))
+    (unless (file-exists-p svg-file)
+      (shell-command (format "inkscape --pdf-poppler -o %s %s" svg-file absolute-path)))
+    svg-file))
 
-Now define pdflatex compilation commands used when =C-c C-e l P= is
-pressed. NOTE: if we currently use =C-c C-c= from a LaTeX buffer
-itself, we encounter an error, if the minted package is used (since it
-needs the =shell-escape= option).
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-pdf-process
-      '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
+(defun copy-file-to-figs-dir (source target extension)
+  "Copies the figure from source (contains suffix) to target and returns the target"
+  (message (format "Copying other image %s to %s of extension %s" source target extension))
+  (unless (file-exists-p target)
+    (copy-file source target))
+  target) ;; return target to replace the match
+
+(defun perform-replacement (path)
+  "Performs replacement of the given path to the target path at './figs',
+potentially converting the file from a PDF to an SVG"
+  (message (format "Replacement of '%s'" path))
+  (let* ((figs-dir "./figs/"))
+    (unless (file-exists-p figs-dir)
+      (make-directory figs-dir))
+    (let* ((filename (file-name-nondirectory path))
+           (extension (file-name-extension path))
+           (relative-path (concat figs-dir filename))
+           (new-file (cond
+                      ((string-equal "pdf" extension) (convert-pdf-to-svg relative-path path))
+                      ((member extension '("png" "jpg" "jpeg")) (copy-file-to-figs-dir path relative-path extension))
+                      (t path))))
+      (message (format "Have filename '%s' extension '%s'" filename extension))
+      new-file)))
+;; (perform-replacement "test_path.txt")
+
+(defun my/org-html-export-figs (backend)
+  "Convert PDF images to SVG in Org buffer for HTML export,
+and replace absolute paths with relative ones pointing to './figs/'.
+Further copy all other figures (PNG, ...) to the same './figs/' dir."
+  (when (eq backend 'html) ; Only process for HTML export
+    (goto-char (point-min))
+    (while (re-search-forward org-link-bracket-re nil t) ; Use the built-in regex for org links
+      (let ((link-data (org-element-context))) ; Get the link data using Org's built-in function
+        (when (eq (car link-data) 'link) ; Check if the context is a link
+          (let* ((path (org-element-property :path link-data))
+                 (type (org-element-property :type link-data)))
+            (when (string= type "file")
+              (let* ((new-file (perform-replacement path)))
+                ;;              (message (format "Match of path '%s' and match of extension '%s' for input" path extension))
+                ;;              (message (format "Handling '%s' of extension '%s' is equal to pdf? '%s'" new-file extension (string-equal "pdf" extension)))
+                (goto-char (org-element-property :begin link-data))
+                (re-search-forward org-link-bracket-re)
+                (replace-match (format "[[%s]]" new-file) nil t)))))))))
+#+end_src
+
+Add he HTML export PDF conversion / figure copy hook to the Org export
+processing hooks that run before the actual export:
+#+begin_src emacs-lisp
+(add-hook 'org-export-before-processing-hook 'my/org-html-export-figs)
+;(remove-hook 'org-export-before-processing-hook 'my/org-html-export-figs)
+;; org-export-before-processing-hook
+;; (remove-hook 'org-export-before-processing-hook 'my/org-pdf-to-svg)
+
+#+end_src
+
+
 
 ** Org theming
 
