@@ -666,6 +666,78 @@ since they collide with our change buffer window key bindings.
 These settings are specifically related to exporting org-mode files to
 HTML, LaTeX etc.
 
+Use the minted package to export org-babel code blocks. Also add some
+options to print line numbers and use the monokai background color, if
+defined. The monokai_bg color used here is (taken from an Org talk):
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \definecolor{monokai_bg}{RGB}{39, 40, 34}
+#+END_EXAMPLE
+and to get minted to use the monokai theme, simply add:
+#+BEGIN_EXAMPLE
+#+LaTeX_HEADER: \usemintedstyle{monokai}
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-latex)
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+   '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg")))
+#+END_SRC
+
+Now define pdflatex compilation commands used when =C-c C-e l P= is
+pressed. NOTE: if we currently use =C-c C-c= from a LaTeX buffer
+itself, we encounter an error, if the minted package is used (since it
+needs the =shell-escape= option).
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-pdf-process
+      '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+*** LaTeX export
+
+Add some default packages we want to use for LaTeX export generally:
+#+begin_src emacs-lisp
+(add-to-list 'org-latex-packages-alist '("" "booktabs"))
+(add-to-list 'org-latex-packages-alist '("" "longtable"))
+(add-to-list 'org-latex-packages-alist '("" "pdfpages"))
+(add-to-list 'org-latex-packages-alist '("" "siunitx"))
+(add-to-list 'org-latex-packages-alist '("" "fontspec"))
+;; package that allows inserting unicode characters in math environment
+(add-to-list 'org-latex-packages-alist '("" "unicode-math"))
+(add-to-list 'org-latex-packages-alist '("" "amsmath"))
+(add-to-list 'org-latex-packages-alist '("" "mhchem"))
+;; Make the default margins on export smaller
+(add-to-list 'org-latex-packages-alist '("margin=2.5cm" "geometry"))
+;; subcaption for subfigures (side by side)
+;; style such that it is placed in parenthesis (a)
+;; ref: https://tex.stackexchange.com/a/131366
+(add-to-list 'org-latex-packages-alist '("labelformat=simple" "subcaption"))
+#+end_src
+
+#+RESULTS:
+| labelformat=simple | subcaption   |     |
+|                    | mhchem       |     |
+|                    | amsmath      |     |
+|                    | unicode-math |     |
+|                    | fontspec     |     |
+|                    | siunitx      |     |
+|                    | pdfpages     |     |
+|                    | longtable    |     |
+|                    | booktabs     |     |
+|                    | minted       |     |
+|                    | minted       | t   |
+|                    | booktabs     | nil |
+
+Configurations for these packages is stored in
+[[file:default_latex_header.org]]
+and needs to be included in the Org file using
+#+begin_example
+#+SETUPFILE: ~/.emacs.d/default_latex_header.org
+#+end_example
+
 Note: following currently not in use. Added to header of org file
 instead, since the following doesn't work. FIXIT
 Include siunitx by default for LaTeX fragments:
