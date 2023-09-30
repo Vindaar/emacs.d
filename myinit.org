@@ -1311,6 +1311,160 @@ and prepends a ~#~ to make it a file local link.
 #+end_src
 
 
+**** HTML specific settings
+
+Set the HTML backend to use our own labels for things instead of
+replacing the labels by Org generated ones. The only advantage of Org
+generated labels is that they are for sure unique. But we can take
+care of that ourselves:
+#+begin_src emacs-lisp
+(setq org-html-prefer-user-labels t)
+#+end_src
+
+Further, we need to enable the HTML5 backend so that the produced HTML
+contains ~<figure>~ tags and ~<figcaption>~ tags instead of using
+regular ~div~ for the figure environment. This is mainly so that we
+can use CSS counters instead of the hardcoded ~figure-number~ divs
+that contain "Figure: %i" essentially.
+
+Ref:
+- https://orgmode.org/manual/HTML-doctypes.html
+  https://emacs.stackexchange.com/a/27697
+#+begin_src emacs-lisp
+(setq org-html-html5-fancy t
+      org-html-doctype "html5")
+#+end_src
+
+Now the relevant CSS that needs to be included in the CSS used by the
+HTML file. This is also found in our 'reference' CSS file:
+[[file:~/org/resources/org_html_export.css]]
+(Thanks GPT4 for making writing CSS tolerable)
+#+begin_src css
+/* Disable the hardcoded figure number of Org */
+.figure-number {
+    display: none;
+}
+
+body {
+    /* Reset only the main figure counter */
+    counter-reset: fig-counter subfig-counter;
+}
+
+figure {
+    /* Increment the global figure counter for every top-level figure */
+    counter-increment: fig-counter;
+}
+
+.figure-wrapper {
+    margin: 3%;
+}
+
+figure:not(.subfigure) {
+    /* Reset the subfigure counter for every new top-level figure */
+    counter-reset: subfig-counter;
+}
+
+/* Use a class to identify subfigures, 'subfigure' */
+/* Use the data-width attribute for the subfigure width */
+figure.subfigure {
+    /* Increment the subfigure counter for every subfigure */
+    counter-increment: subfig-counter;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    padding: 0 0.0%;
+    margin: 0;
+/* vertical alignment could be nice, but is broken if one caption is longer! */
+/*    vertical-align: bottom; */
+}
+
+figure.subfigure[data-width] {
+    width: attr(data-width);  /* Fetch width from data-width attribute */
+}
+
+/* Use the data-width attribute for the image width within subfigures */
+figure.subfigure img[data-width] {
+    width: attr(data-width);      /* Fetch width from data-width attribute */
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+figure.subfigure figcaption {
+    text-align: center; /* Centers the text within the figcaption */
+    display: block;     /* Ensures figcaption behaves like a block */
+    margin: 0 auto;     /* Centers the block itself, if it's not already full width */
+}
+
+figcaption::before {
+    /* Display the global counter value before each main figcaption */
+    content: "Figure " counter(fig-counter) ": ";
+}
+
+/* Use the subfig class to display the subfigure counter */
+figure.subfigure figcaption::before {
+    /* Display the combined global and subfigure counter values */
+    content: counter(fig-counter) " - " counter(subfig-counter, lower-alpha) ": ";
+}
+#+end_src
+
+
+Handling the size of the figures based on their ~data-width~ attribute
+(of the ~<figure>~ tag) using some JS. Also make the images clickable
+such that they double in size on click (side-by-side to
+top-to-bottom):
+
+- We also added a bit of JS code to adjust the sizes of all plots with a
+  ~data-width~ field. We just abuse the MathJax script string, because
+  it guarantees the JS code appears next to other JS code.
+- More JS code to make the side-by-side images clickable so that we
+  double their size (top to bottom after clicking) to have them much
+  larger.
+  - [X] *Maybe this should only double that specific version?*
+#+begin_src emacs-lisp
+(setq org-html-head
+      "
+<link rel='stylesheet' type='text/css' href='org_html_export.css' />
+<script type='text/javascript'>
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set the initial width for subfigures and their images
+    document.querySelectorAll('figure.subfigure[data-width]').forEach(function(subfigure) {
+        subfigure.style.width = subfigure.getAttribute('data-width');
+    });
+
+    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
+        img.style.width = img.getAttribute('data-width');
+    });
+
+    // Event listener for images within subfigures
+    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
+        img.addEventListener('click', function() {
+            // Determine the .figure-wrapper that contains the clicked image
+            let wrapper = this.closest('.figure-wrapper');
+
+            // If found, adjust the sizes of its subfigures
+            if (wrapper) {
+                let subfigures = wrapper.querySelectorAll('figure.subfigure');
+                subfigures.forEach(subfigure => {
+                    let width = parseFloat(subfigure.getAttribute('data-width'));
+                    if (width < 50) { // Double size if less than 50%
+                        subfigure.setAttribute('data-width', (width * 2) + '%');
+                        subfigure.style.width = (width * 2) + '%';
+                    } else { // Halve size otherwise
+                        subfigure.setAttribute('data-width', (width / 2) + '%');
+                        subfigure.style.width = (width / 2) + '%';
+                    }
+                });
+            }
+        });
+    });
+});
+
+</script>
+")
+#+end_src
+
 ** Org theming
 
 Some settings for nicer looks when editing org mode. These functions need to be
