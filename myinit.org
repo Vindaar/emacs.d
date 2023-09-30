@@ -184,6 +184,8 @@ The following contains the settings related to themes.
 
 Change the default font to Inconsolata:
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist
+             '(font . "Inconsolata-12"))
 (set-face-attribute 'default t :font "Inconsolata-12" )
 (set-frame-font "Inconsolata-12")
 #+END_SRC
