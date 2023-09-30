@@ -597,6 +597,39 @@ seems correct. Weird.
 
 #+END_SRC
 
+#+begin_src emacs-lisp
+(use-package ox-hugo
+  :ensure t
+  :after ox)
+#+end_src
+
+** org-ref settings
+
+Tell ~org-ref~ / ~helm-bibtex~ where our paper PDFs are and which
+field of a bibtex entry tells it the filename: 
+#+begin_src emacs-lisp
+(setq bibtex-completion-library-path '("~/org/Papers/"))
+(setq bibtex-completion-pdf-field "File")
+#+end_src
+
+Use ~evince~ to open PDFs instead of using the 
+#+begin_src emacs-lisp
+(setq bibtex-completion-pdf-open-function
+  (lambda (fpath)
+    (message fpath)
+    (call-process "evince" nil 0 nil (expand-file-name fpath))))
+#+end_src
+
+#+RESULTS:
+| lambda | (fpath) | (message fpath) | (call-process evince nil 0 nil (expand-file-name fpath)) |
+
+#+begin_src emacs-lisp
+(setq doi-utils-async-download t)
+#+end_src
+
+#+RESULTS:
+: t
+
 ** Flyspell-mode
 
 To get spell checking in Org (well every text buffer), we use =flyspell-mode=. Activate it
