@@ -405,6 +405,11 @@ And make sure ghostscript path is correct:
 
 Change the =org-preview-latex-process-alist= to use =xelatex= as well
 and the DVI -> SVG backend.
+
+*NOTE*: We use =xelatex= instead of =lualatex= here, as that way we
+ can use =dvisvgm= with =xdv= file input. We could maybe also use
+ =dvilualatex= as a compiler and use regular =dvi= as input, but this
+ way works well (we still use =lualatex= for regular compilation of documents).
 #+begin_src emacs-lisp
 (setq org-preview-latex-process-alist
       '((dvipng :programs
@@ -428,7 +433,7 @@ and the DVI -> SVG backend.
                      :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :image-size-adjust
                      (1.0 . 1.0)
                      :latex-compiler
-                     ("xelatex --shell-escape -interaction nonstopmode -output-directory %o %f")
+                     ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
                      :image-converter
                      ("convert -density %D -trim -antialias %f -quality 100 %O"))))
 (setq org-preview-latex-default-process 'dvisvgm)
@@ -607,9 +612,9 @@ seems correct. Weird.
 #+END_SRC
 
 #+begin_src emacs-lisp
-(use-package ox-hugo
-  :ensure t
-  :after ox)
+;;(use-package ox-hugo
+;;  :ensure t
+;;  :after ox)
 #+end_src
 
 Setup our ~zsh~ blocks to use same syntax highlighting as ~sh~:
