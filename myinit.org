@@ -637,6 +637,36 @@ Use ~evince~ to open PDFs instead of using the
 #+RESULTS:
 : t
 
+** Allow inserting links to custom IDs
+
+We want to be able easily insert links to CUSTOM_IDs in an Org
+document easily, similar to ~C-c C-l~ for ~org-insert-link~ using Helm
+and fuzzy completion support. We start by having a function to collect
+all IDs in the buffer and then having an interactive function that
+takes all completion elements from that function and map it to ~C-c C-i~:
+#+begin_src emacs-lisp
+(defun my/org-custom-id-complete ()
+  "Provide a list of CUSTOM_IDs in the current buffer for completion."
+  (let ((id-regex "^[ \t]*:CUSTOM_ID:[ \t]+\\(\\S-+\\)")
+        (ids '()))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward id-regex nil t)
+        (push (match-string-no-properties 1) ids)))
+    ids))
+
+(defun my/org-insert-custom-id-link ()
+  "Insert a link to a CUSTOM_ID with Helm completion."
+  (interactive)
+  (let ((selected-id (helm :sources (helm-build-sync-source "CUSTOM_IDs"
+                                      :candidates (my/org-custom-id-complete))
+                           :buffer "*helm org custom ids*")))
+    (when selected-id
+      (insert (format "[[#%s]]" selected-id selected-id)))))
+
+(define-key org-mode-map (kbd "C-c C-i") 'my/org-insert-custom-id-link)
+#+end_src
+
 ** Flyspell-mode
 
 To get spell checking in Org (well every text buffer), we use =flyspell-mode=. Activate it
