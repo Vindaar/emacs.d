@@ -537,7 +537,8 @@ Load source code support for org mode for some so far used languages.
  '((emacs-lisp . t)
    (python . t)
    (C . t)
-   (shell . t)))
+   (shell . t)
+   (nim . t)))
 #+END_SRC
 
 Fontify source blocks (enable syntax highlighting of source code)
@@ -602,6 +603,11 @@ seems correct. Weird.
 (use-package ox-hugo
   :ensure t
   :after ox)
+#+end_src
+
+Setup our ~zsh~ blocks to use same syntax highlighting as ~sh~:
+#+begin_src emacs-lisp
+(add-to-list 'org-src-lang-modes '("zsh" . sh))
 #+end_src
 
 ** org-ref settings
