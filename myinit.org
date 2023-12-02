@@ -1117,6 +1117,7 @@ figures"
     (cl-letf (((symbol-function 'label) 'label-latex)
               ((symbol-function 'ref) 'ref-latex)
               ((symbol-function 'caption) 'caption-latex)
+              ((symbol-function 'spacing) 'spacing-latex)              
               ((symbol-function 'includegraphics) 'includegraphics-latex)
               ((symbol-function 'subfigure) 'subfigure-latex)
               ((symbol-function 'figure) 'figure-latex)
@@ -1130,6 +1131,7 @@ figures"
     (cl-letf (((symbol-function 'label) 'label-html)
               ((symbol-function 'ref) 'ref-html)
               ((symbol-function 'caption) 'caption-html)
+              ((symbol-function 'spacing) 'spacing-html)                            
               ((symbol-function 'includegraphics) 'includegraphics-html)
               ((symbol-function 'subfigure) 'subfigure-html)
               ((symbol-function 'figure) 'figure-html)
@@ -1182,6 +1184,13 @@ DSL commands for the LaTeX backend:
   (list :caption (format "\\caption{%s}"
 	                 (mapconcat 'eval body ""))))
 
+(defun spacing-latex (&rest body)
+  "Can be used to set the 'spacing' symbol to use after the `subfigure` command.
+   The default is a literal '%'. Set to the empty string if you want to line break
+   and e.g. place 4 subfigures in a grid."
+  (list :spacing (format "%s"
+	                 (mapconcat 'eval body ""))))
+
 (defun includegraphics-latex (options path)
   (format "\\includegraphics%s{%s}"
 	  (if options
@@ -1195,19 +1204,20 @@ DSL commands for the LaTeX backend:
 	    "")
 	  path))
 
-(defun subfigure-latex (width caption label body)
+(defun subfigure-latex (width caption label body &optional spacing)
   (message "Is it true? %s " (string-prefix-p "\\caption" caption))
   (message "Caption is: %s " caption)
   (unless (plist-get caption :caption)
     (error "Expected a caption of the form \\caption{foo}, got %s" caption))
   (unless (plist-get label :label)
     (error "Expected a label of the form \\label{foo}, got %s" label))
-  (list :subfigure (format "\\begin{subfigure}{%s}
+  (let ((spacing (or spacing (list :spacing "%"))))
+    (list :subfigure (format "\\begin{subfigure}{%s}
   %s
   %s
   %s
-\\end{subfigure}%%"
-                           width body (plist-get caption :caption) (plist-get label :label))))
+\\end{subfigure}%s"
+                             width body (plist-get caption :caption) (plist-get label :label) (plist-get spacing :spacing)))))
 
 (defun figure-latex (options &rest body)
   (message "%s" (process-args-to-plist body))
@@ -1258,6 +1268,13 @@ And for HTML (unfinished + we still need to rename the functions!)
   (list :caption (format "<figcaption>%s</figcaption>"
 	                 (mapconcat 'eval body ""))))
 
+(defun spacing-html (&rest body)
+  "Can be used to set the 'spacing' symbol to use after the `subfigure` command.
+   The default is a literal '%'. Set to the empty string if you want to line break
+   and e.g. place 4 subfigures in a grid. Does not do anything on HTML"
+  (list :spacing (format "%s"
+	                 (mapconcat 'eval body ""))))
+
 (defun includegraphics-html (options path)
   ;; 1. perform replacement of the actual file we insert
   (unless (listp options)
@@ -1269,7 +1286,7 @@ And for HTML (unfinished + we still need to rename the functions!)
     (format "<img src=\"%s\" %s >" ;; for now ignore size
 	                 new-file (cdr (car options)))))
 
-(defun subfigure-html (width caption label body)
+(defun subfigure-html (width caption label body &optional spacing)
   (list :subfigure (format "<figure class=\"subfigure\" id=\"%s\" %s>%s%s</figure>"
                            (plist-get label :label) width body (plist-get caption :caption))))
 ;;	  (mapconcat 'eval body "")))
