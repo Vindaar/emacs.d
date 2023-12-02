@@ -60,6 +60,7 @@ them:
                     ;;xah-math-input
                     org-ref
                     helm-bibtex
+                    helm-org
                     ))
 #+END_SRC
 
@@ -497,12 +498,12 @@ current relative path given.
 
 * Org mode
 
-
 #+BEGIN_SRC emacs-lisp
 (require 'org)
 (require 'org-ref)
 (require 'org-ref-helm)
 (require 'doi-utils)
+(require 'helm-org)
 #+END_SRC
 
 Disable the =C-'= binding for org-mode, since this conflicts with
