@@ -20,7 +20,7 @@
 
 
 # Change some siunitx settings for sirange and styling 
-#+LATEX_HEADER: \sisetup{mode=text,range-phrase = {\text{~to~}}, range-units=single, print-unity-mantissa=false}
+#+LATEX_HEADER: \sisetup{mode=text,range-phrase = {\text{~to~}}, range-units=single, print-unity-mantissa=false, round-mode=uncertainty, round-precision=2}
 # Add year as a unit
 #+LATEX_HEADER: \DeclareSIUnit\year{yr}
 # Change default font for code blocks
@@ -43,7 +43,7 @@
 #+LATEX_HEADER: \newcommand{\green}{\textcolor{green}}
 #+LATEX_HEADER: \newcommand{\red}{\textcolor{red}}
 # Some custom commands for convenience
-#+LATEX_HEADER: \newcommand{\ccsini}{$\mathrm{Si}₃\mathrm{N}₄$}
+#+LATEX_HEADER: \newcommand{\ccsini}{$\ce{Si_3 N_4}$~}
 #+LATEX_HEADER: \newcommand{\cefe}{$\ce{^{55}Fe}$~}
 #+LATEX_HEADER: \newcommand{\vektor}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
 #+LATEX_HEADER: \newcommand{\mtrix}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
