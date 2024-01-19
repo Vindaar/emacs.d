@@ -375,6 +375,21 @@ Set the emacs exec-path to the normal PATH variable.
 #+END_SRC
 
 
+** Unicode
+
+Change how the character 'θ' is displayed in emacs. By default if we
+use Inconsolata both 'ϑ' and 'θ' appear to use the same character,
+which is pretty annoying.
+
+The number '952' is the decimal representation of the unicode code
+point of the character. To get it, call =describe-char= on the
+character. That brings up all sorts of information about the
+character, including hexadecimal and decimal numbers (decimal under 'decomposition').
+#+begin_src emacs-lisp
+(set-fontset-font "fontset-default" '(952 . 952)
+                  (font-spec :register "CMU")
+                  nil 'prepend)
+#+end_src
 
 * TeX related settings
 This part contains settings related to LaTeX. Most TeX related
