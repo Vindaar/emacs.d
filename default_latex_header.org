@@ -1,6 +1,23 @@
 # This file contains the default configuration we typically use in Org
-# files for LaTeX export. It depends on the packages being added to
-# `org-latex-packages-alist` in our emacs config!
+# files for LaTeX export.
+# We place all packages we wish to include here as well, because that
+# way we can have different defaults used for e.g. LaTeX and beamer by
+# using different SETUPFILES for both
+
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{pdfpages}
+#+LATEX_HEADER: \usepackage{siunitx}
+# package that allows inserting unicode characters in math environment
+#+LATEX_HEADER: \usepackage{unicode-math}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{mhchem}
+# Make the default margins on export smaller
+#+LATEX_HEADER: \usepackage[margin=2.5cm]{geometry}
+# subcaption for subfigures (side by side)
+# style such that it is placed in parenthesis (a)
+# ref: https://tex.stackexchange.com/a/131366
+#+LATEX_HEADER: \usepackage[labelformat=simple]{subcaption}
 
 # Overwrite the default text color in use for minted!
 #+LATEX_HEADER: \usepackage{xcolor}
@@ -60,3 +77,20 @@
 # maybe 1.4 is optimal?
 # The default *I think* is 1.2
 #+LATEX_HEADER: \linespread{1.5} % change line spacing to be a bit larger. TODO: find good value!
+
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \directlua{
+#+LATEX_HEADER:   luaotfload.add_fallback(
+#+LATEX_HEADER:   "FallbackFonts",
+#+LATEX_HEADER:   {
+#+LATEX_HEADER:         "DejaVu Serif:mode=harf;",
+#+LATEX_HEADER:         "DejaVu Sans Mono:mode=harf;",
+#+LATEX_HEADER:         % we could add many more fonts here optionally!
+#+LATEX_HEADER:     }
+#+LATEX_HEADER:   )
+#+LATEX_HEADER: }
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \setmainfont{STIXTwoText}[RawFeature={fallback=FallbackFonts}]
+#+LATEX_HEADER: \setmathfont{STIXTwoMath-Regular}[RawFeature={fallback=FallbackFonts}]
+#+LATEX_HEADER: \setmonofont{Inconsolata}[RawFeature={fallback=FallbackFonts}]

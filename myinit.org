@@ -763,22 +763,24 @@ needs the =shell-escape= option).
 *** LaTeX export
 
 Add some default packages we want to use for LaTeX export generally:
+*UPDATE*: <2024-04-01 Mon 19:04> Moved this directly into the
+SETUPFILE below. Easier to have different settings that way.
 #+begin_src emacs-lisp
-(add-to-list 'org-latex-packages-alist '("" "booktabs"))
-(add-to-list 'org-latex-packages-alist '("" "longtable"))
-(add-to-list 'org-latex-packages-alist '("" "pdfpages"))
-(add-to-list 'org-latex-packages-alist '("" "siunitx"))
-(add-to-list 'org-latex-packages-alist '("" "fontspec"))
-;; package that allows inserting unicode characters in math environment
-(add-to-list 'org-latex-packages-alist '("" "unicode-math"))
-(add-to-list 'org-latex-packages-alist '("" "amsmath"))
-(add-to-list 'org-latex-packages-alist '("" "mhchem"))
-;; Make the default margins on export smaller
-(add-to-list 'org-latex-packages-alist '("margin=2.5cm" "geometry"))
-;; subcaption for subfigures (side by side)
-;; style such that it is placed in parenthesis (a)
-;; ref: https://tex.stackexchange.com/a/131366
-(add-to-list 'org-latex-packages-alist '("labelformat=simple" "subcaption"))
+;; (add-to-list 'org-latex-packages-alist '("" "booktabs"))
+;; (add-to-list 'org-latex-packages-alist '("" "longtable"))
+;; (add-to-list 'org-latex-packages-alist '("" "pdfpages"))
+;; (add-to-list 'org-latex-packages-alist '("" "siunitx"))
+;; (add-to-list 'org-latex-packages-alist '("" "fontspec"))
+;; ;; package that allows inserting unicode characters in math environment
+;; (add-to-list 'org-latex-packages-alist '("" "unicode-math"))
+;; (add-to-list 'org-latex-packages-alist '("" "amsmath"))
+;; (add-to-list 'org-latex-packages-alist '("" "mhchem"))
+;; ;; Make the default margins on export smaller
+;; (add-to-list 'org-latex-packages-alist '("margin=2.5cm" "geometry"))
+;; ;; subcaption for subfigures (side by side)
+;; ;; style such that it is placed in parenthesis (a)
+;; ;; ref: https://tex.stackexchange.com/a/131366
+;; (add-to-list 'org-latex-packages-alist '("labelformat=simple" "subcaption"))
 #+end_src
 
 #+RESULTS:
