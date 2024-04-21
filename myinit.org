@@ -1011,37 +1011,74 @@ and replace absolute paths with relative ones pointing to './figs/'."
             (shell-command (format "inkscape -o %s %s.pdf" svg-file absolute-path)))
           (replace-match (format "[[%s]]" svg-file) nil t))))))
 
+(defun file-size (path)
+  "Returns the file size of the given file"
+  (file-attribute-size (file-attributes path)))
+
+(defun check-and-convert (target extension input)
+  "Checks if 'input' already exists, if not converts it using 'inkscape' to a filename of
+'target' of type 'extension'. In either case returns the target file name."
+  (let* ((outfile (concat (file-name-sans-extension target) extension)))
+    (unless (file-exists-p outfile)
+      (progn
+        (message "Converting %s to %s" input outfile)
+        (shell-command (format "inkscape --pdf-poppler -o %s %s" outfile input))))
+    outfile))
+
 (defun convert-pdf-to-svg (relative-path absolute-path)
-  "Converts the given file.pdf (relative-path contains the `.pdf` suffix) to file.svg and places the SVG in path"
-  (let* ((svg-file (concat (file-name-sans-extension relative-path) ".svg")))
-    (message (format "Converting %s to %s" absolute-path svg-file))
-    (unless (file-exists-p svg-file)
-      (shell-command (format "inkscape --pdf-poppler -o %s %s" svg-file absolute-path)))
-    svg-file))
+  "Converts the given file.pdf (relative-path contains the `.pdf` suffix) to file.svg and places the SVG in path,
+if the given file is larger than 5MB we convert to a PNG instead (hopefully working around freezing the entire
+computer!"
+  (if (file-exists-p absolute-path)
+      (if (<= (file-size absolute-path) 5000000)
+          (check-and-convert relative-path ".svg" absolute-path) ;; create SVG file
+        (progn
+          (message "Skipping file %s because it is too large. Converting to PNG instead." absolute-path)
+          (check-and-convert relative-path ".png" absolute-path))) ;; create PNG file
+    (progn
+      (message "[WARNING] The file %s does not exist on your file system." absolute-path)
+      absolute-path)))
 
 (defun copy-file-to-figs-dir (source target extension)
   "Copies the figure from source (contains suffix) to target and returns the target"
   (message (format "Copying other image %s to %s of extension %s" source target extension))
   (unless (file-exists-p target)
+    (let* ((target-path (file-name-parent-directory target)))
+      (unless (file-exists-p target-path) ;; Create target directory if not exists
+        (make-directory target-path t)))
     (copy-file source target))
   target) ;; return target to replace the match
 
 (defun perform-replacement (path)
   "Performs replacement of the given path to the target path at './figs',
-potentially converting the file from a PDF to an SVG"
+potentially converting the file from a PDF to an SVG.
+Note that importantly we keep the file structure of the original paths in tact. This leads
+to quite a nested directory structure inside of `./figs`, but I think it is worth it to
+keep in tact where files come from. Especially with duplicate file names it would be a mess.
+We 'leak' our directory structure when uploading data, but that's fine imo.
+For this reason it is important that 'path' has already been fully expanded!
+Note that we do not perform any replacement on file types other than 'pdf', 'jpg', 'png'!
+"
   (message (format "Replacement of '%s'" path))
   (let* ((figs-dir "./figs/"))
     (unless (file-exists-p figs-dir)
       (make-directory figs-dir))
     (let* ((filename (file-name-nondirectory path))
            (extension (file-name-extension path))
-           (relative-path (concat figs-dir filename))
+           (relative-path (concat figs-dir path)) ;; Copy e.g. /home/basti/org/Figs/foo.pdf to ./figs/home/basti/org/Figs/foo.svg
+           ;; to keep relative directory structure (if multiple filenames clash and for sanity!)
            (new-file (cond
                       ((string-equal "pdf" extension) (convert-pdf-to-svg relative-path path))
                       ((member extension '("png" "jpg" "jpeg")) (copy-file-to-figs-dir path relative-path extension))
                       (t path))))
-      (message (format "Have filename '%s' extension '%s'" filename extension))
-      new-file)))
+      (message (format "Have filename '%s' extension '%s'" filename extension ))
+      (message (format "Will be copied to: '%s'" new-file ))
+      (when (not new-file)
+        (message (format "Path exists %s" (file-exists-p (file-name-parent-directory new-file)))))
+      (when (and extension (not (string-equal new-file path)))  ;; Only if this is a file, has an extension and is not 'path'      
+        (unless (file-exists-p (file-name-parent-directory new-file))
+          (make-directory (file-name-parent-directory new-file) t))) ;; create nested directory, i.e. `t` for PARENTS argument
+      (concat "./" (file-relative-name new-file "./"))))) ;; sanitize the path from './' on
 ;; (perform-replacement "test_path.txt")
 
 (defun my/org-html-export-figs (backend)
@@ -1056,13 +1093,16 @@ Further copy all other figures (PNG, ...) to the same './figs/' dir."
           (let* ((path (org-element-property :path link-data))
                  (type (org-element-property :type link-data)))
             (when (string= type "file")
-              (let* ((new-file (perform-replacement path)))
+              (let* ((new-file (perform-replacement (expand-file-name path)))) ;; make sure to expand `~` etc
                 ;;              (message (format "Match of path '%s' and match of extension '%s' for input" path extension))
                 ;;              (message (format "Handling '%s' of extension '%s' is equal to pdf? '%s'" new-file extension (string-equal "pdf" extension)))
                 (goto-char (org-element-property :begin link-data))
                 (re-search-forward org-link-bracket-re)
                 (replace-match (format "[[%s]]" new-file) nil t)))))))))
 #+end_src
+
+#+RESULTS:
+: my/org-html-export-figs
 
 Add he HTML export PDF conversion / figure copy hook to the Org export
 processing hooks that run before the actual export:
