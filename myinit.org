@@ -313,6 +313,12 @@ Enable yanking of the PRIMARY buffer via the middle mouse button in
 (setq select-enable-primary t)
 #+end_src
 
+Change the number of messages stored in the ~*Messages*~ buffer
+(default is only 1000).
+#+begin_src emacs-lisp
+(setq message-log-max 100000)
+#+end_src
+
 ** Expansion
 
 Use =hippie-expand= for expansion by default:
