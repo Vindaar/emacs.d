@@ -1,0 +1,163 @@
+# This file contains the default configuration we typically use in Org
+# files for LaTeX beamer export.
+# It is mostly similar to the LaTeX default file with some notable
+# changes.
+
+# We place all packages we wish to include here as well, because that
+# way we can have different defaults used for e.g. LaTeX and beamer by
+# using different SETUPFILES for both
+
+
+
+#+startup: beamer
+#+LATEX_CLASS: beamer
+
+# set to 16:9
+#+LaTeX_CLASS_options: [8pt,aspectratio=169]
+
+# disable the navigation bar 
+#+LaTeX_HEADER:\beamertemplatenavigationsymbolsempty
+
+# enable page numbers in footer
+# define the page numbers without total numbers
+#+LATEX_HEADER:\setbeamertemplate{footline}{% 
+#+LATEX_HEADER:  \hfill% 
+#+LATEX_HEADER:  \usebeamercolor[fg]{page number in head/foot}% 
+#+LATEX_HEADER:  \usebeamerfont{page number in head/foot}% 
+#+LATEX_HEADER:  \insertframenumber%
+#+LATEX_HEADER:  %\,/\,\inserttotalframenumber
+#+LATEX_HEADER:  \kern1em\vskip2pt% 
+#+LATEX_HEADER:}
+
+
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{pdfpages}
+#+LATEX_HEADER: \usepackage{siunitx}
+# package that allows inserting unicode characters in math environment
+#+LATEX_HEADER: \usepackage{unicode-math}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{mhchem}
+# subcaption for subfigures (side by side)
+# style such that it is placed in parenthesis (a)
+# ref: https://tex.stackexchange.com/a/131366
+#+LATEX_HEADER: \usepackage[labelformat=simple]{subcaption}
+
+# Overwrite the default text color in use for minted!
+#+LATEX_HEADER: \usepackage{xcolor}
+#+LATEX_HEADER: \definecolor{defaultMintedColor}{HTML}{808080}
+# Well, this breaks the coloring of the line numbers..........
+# So we choose a color that is both visible within the background
+# color of the code as well as outside.
+#+LATEX_HEADER: \AtBeginEnvironment{minted}{\color{defaultMintedColor}}
+
+# Change some siunitx settings for sirange and styling 
+#+LATEX_HEADER: \sisetup{mode=text,range-phrase = {\text{~to~}}, range-units=single, print-unity-mantissa=false, round-mode=uncertainty, round-precision=2}
+# Add year as a unit
+#+LATEX_HEADER: \DeclareSIUnit\year{yr}
+# Change default font for code blocks
+#+LATEX_HEADER: \setmonofont{Fira Code} % suports all unicode we care about in code
+# Change subfigure command slightly
+#+LATEX_HEADER: \renewcommand\thesubfigure{(\alph{subfigure})}
+# Use monokai style by default for minted
+#+LATEX_HEADER: \usemintedstyle{monokai}
+
+# ##############################
+# Define the monokai colors
+# ##############################
+
+#+LATEX_HEADER: \definecolor{monokai_bg}{RGB}{39, 40, 34}
+#+LATEX_HEADER: \definecolor{monokai_fg}{RGB}{241, 235, 235}
+#+LATEX_HEADER: \definecolor{monokai_0}{RGB}{72,72,62}
+#+LATEX_HEADER: \definecolor{monokai_1}{RGB}{220,37,102}
+#+LATEX_HEADER: \definecolor{monokai_3}{RGB}{212,201,110}
+#+LATEX_HEADER: \definecolor{monokai_4}{RGB}{85,188,206}
+# something is wrong with this 5
+# however, looks better on slides
+#+LATEX_HEADER: \definecolor{monokai_5}{RGB}{80,40,151}
+# this is the original, but it's too bright
+# #+LATEX_HEADER: \definecolor{monokai_5}{RGB}{147, 88, 254}
+#+LATEX_HEADER: \definecolor{monokai_7}{RGB}{172,173,161}
+#+LATEX_HEADER: \definecolor{monokai_8}{RGB}{118,113,94}
+#+LATEX_HEADER: \definecolor{monokai_9}{RGB}{250,39,114}
+#+LATEX_HEADER: \definecolor{monokai_11}{RGB}{231, 219, 117}
+#+LATEX_HEADER: \definecolor{monokai_15}{RGB}{207,208,194}
+#+LATEX_HEADER: \definecolor{monokai_green}{RGB}{166, 226, 46}
+#+LATEX_HEADER: \definecolor{monokai_orange}{RGB}{253, 151, 31}
+#+LATEX_HEADER: \definecolor{monokai_term_5}{RGB}{175,135,255}
+# And some helper color commands
+#+LATEX_HEADER: \newcommand{\orange}{\textcolor{monokai_orange}}
+#+LATEX_HEADER: \newcommand{\green}{\textcolor{green}}
+#+LATEX_HEADER: \newcommand{\red}{\textcolor{red}}
+
+
+# Some custom commands for convenience
+#+LATEX_HEADER: \newcommand{\ccsini}{$\ce{Si_3 N_4}$~}
+#+LATEX_HEADER: \newcommand{\cefe}{$\ce{^{55}Fe}$~}
+#+LATEX_HEADER: \newcommand{\vektor}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+#+LATEX_HEADER: \newcommand{\mtrix}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+#+LATEX_HEADER: \newcommand{\cp}{$\mathrm{CP}$~}
+#+LATEX_HEADER: \newcommand{\cpt}{$\mathrm{CPT}$~}
+# Define a nicer, upright differential operator
+#+LATEX_HEADER: \newcommand{\dd}{\mathop{}\!{\mathrm{d}}}
+# \sinc function
+#+LATEX_HEADER: \DeclareMathOperator{\sinc}{sinc}
+# likelihood
+#+LATEX_HEADER: \newcommand{\Lhood}{\mathcal{L}}
+
+
+# define additional packages
+#+LATEX_HEADER: \usepackage{siunitx}
+#+LATEX_HEADER: \sisetup{mode=text,range-phrase = {\text{~to~}}, range-units=single, print-unity-mantissa=false}
+#+LATEX_HEADER: \usepackage{mhchem}
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LaTeX_HEADER: \usepackage{pdfpages}
+#+LATEX_HEADER: \usetheme{Singapore}
+#+LATEX_HEADER: \usecolortheme{rose}
+#+LATEX_HEADER: \usefonttheme{professionalfonts}
+#+LATEX_HEADER: \usepackage{luatextra}
+#+LATEX_HEADER: \useinnertheme{rounded}
+
+# set org beamer export options
+# headline of depth 2 == frame (H:2)
+# no table of contents (toc:nil)
+#+OPTIONS: ^:nil H:2 toc:nil
+
+# ##############################
+# change output of code blocks to use monokai
+# ##############################
+#+LaTeX_HEADER: \usemintedstyle{monokai}
+
+# ##############################
+# Change the style of bullet points and enumerations to flat circles
+# ##############################
+
+# change singapore style of items from ball to circle
+#  #+LATEX_HEADER: \setbeamertemplate{itemize items}[circle]
+#  #+LATEX_HEADER: \setbeamertemplate{enumerate items}[circle]
+# in one line:
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+
+
+# ##############################
+# Apply different colors to the theme
+# ##############################
+
+# structure is the default theme color
+#+LATEX_HEADER: \setbeamercolor{structure}{fg=monokai_0}
+#+LATEX_HEADER: \setbeamercolor{title}{fg=monokai_5}
+#+LATEX_HEADER: \setbeamercolor{frametitle}{fg=monokai_5}
+# text of the block title
+#+LATEX_HEADER: \setbeamercolor{block title}{fg=monokai_5}
+# background of block title
+# #+LATEX_HEADER: \setbeamercolor{block title}{bg=monokai_7}
+# text in a block
+#+LATEX_HEADER: \setbeamercolor{block body}{fg=monokai_bg}
+#+LATEX_HEADER: \setbeamercolor{itemize item}{fg=monokai_orange}
+# enumeration points (thanks to rounded theme under item projected)
+#+LATEX_HEADER: \setbeamercolor{item projected}{bg=monokai_orange}
+#+LATEX_HEADER: \setbeamercolor{item projected}{fg=monokai_0}
+#+LATEX_HEADER: \setbeamercolor{normal text}{fg=monokai_bg}
+#+LATEX_HEADER: \setbeamercolor{alerted text}{fg=monokai_1}
+
+#+LATEX_HEADER: \newcommand{\beamerbullet}{\textcolor{monokai_orange}{\textbullet}}
