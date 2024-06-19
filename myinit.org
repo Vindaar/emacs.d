@@ -1734,6 +1734,42 @@ c++-mode, and a few others)
 (add-hook 'c-mode-common-hook 'ac-etags-ac-setup)
 #+END_SRC
 
+** Go
+
+#+BEGIN_SRC emacs-lisp
+(defun my-go-mode-hook ()
+  "Custom configurations for Go mode."
+  (setq tab-width 4)              ; Set tab width to 4 spaces
+  (setq indent-tabs-mode t)       ; Use tabs for indentation
+  )
+#+END_SRC
+
+#+RESULTS:
+: my-go-mode-hook
+
+Some hooks for Go:
+#+BEGIN_SRC emacs-lisp
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+(add-hook 'go-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'go-mode-hook #'subword-mode)
+#+END_SRC
+
+#+RESULTS:
+| subword-mode | rainbow-delimiters-mode |
+
+** Rust
+
+Some hooks for Rust:
+#+BEGIN_SRC emacs-lisp
+(add-hook 'rust-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'rust-mode-hook #'subword-mode)
+#+END_SRC
+
+#+RESULTS:
+| subword-mode | rainbow-delimiters-mode | rust-maybe-initialize-buffer-project |
+
+
+
 ** Python
 
 Some sensible settings for Python. Activating python-mode per default
