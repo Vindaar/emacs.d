@@ -1182,10 +1182,14 @@ if so evaluating their body."
 ;;           (delete-region begin end)
 ;;           (insert result))))))
 
-(defun my/org-process-subfigure-dsl (backend)
+(defun my/org-process-subfigure-dsl (backend &optional subtreep)
   "Processes `subfigure` Org source code blocks, which contain our subfigure DSL.
 This DSL generates different code for the LaTeX and HTML backends to produce side by side
-figures"
+figures.
+The optional `subtreep` argument is for when we advice `org-ref-process-buffer`, which
+passes this argument and is used to select whether we currently restrict to a subtree.
+We just ignore it here.
+  "
   (cond
    ((eq backend 'latex)
     ;; cl-letf ;; bind backend specific functions!
@@ -1220,11 +1224,15 @@ figures"
 #+end_src
 
 And now apply that hook also to the list of Org preprocessing hooks:
+*NOTE*: For the HTML backend this hook doesn't do anything. We already
+advise an ~org-ref~ function to perform the processing before
+~org-ref~ processes the document. Ideally we wouldn't rerun it again though!
+
 #+begin_src emacs-lisp
-;; Need to think about which order to apply this hook relative to the other
-;; HTML hook that converts PDFs to SVG!
 (add-hook 'org-export-before-processing-hook 'my/org-process-subfigure-dsl)
-;(remove-hook 'org-export-before-processing-hook 'my/org-process-subfigure-dsl)
+;;(add-hook 'org-export-before-parsing-hook 'my/org-process-subfigure-dsl)
+;;(remove-hook 'org-export-before-parsing-hook 'my/org-process-subfigure-dsl)
+;;(remove-hook 'org-export-before-processing-hook 'my/org-process-subfigure-dsl)
 #+end_src
 
 
@@ -1369,20 +1377,29 @@ And for HTML (unfinished + we still need to rename the functions!)
 ;;	    (concat "<br>"
 ;;		    (mapconcat 'eval options "")))))
 
+;;    (message "LABEL %s CAPTION %s FIGS %s" label caption figs)
+;;    (format "\n#+BEGIN_EXPORT HTML
+;;<figure class=\"figure-wrapper\" id=\"%s\">
+;;%s
+;;%s
+;;</figure>
+;;#+END_EXPORT\n\n" (string-join label "\n") (string-join figs " ") (string-join caption " "))))
+
 (defun figure-html (options &rest body)
+  "NOTE: We do not wrap the output in a `#+BEGIN_EXPORT HTML` for now, because when using
+the subfigure DSL this breaks ~org-ref~. We need to run a fixup script after producing the HTML."  
   ;; process the inputs
   (message "%s" (process-args-to-plist body))
   (let* ((fig-body (process-args-to-plist body))  ;;(process-args-to-plist 'body)
          (label (plist-get fig-body :label))
          (caption (plist-get fig-body :caption))
          (figs (plist-get fig-body :subfigure)))
-    (message "LABEL %s CAPTION %s FIGS %s" label caption figs)
-    (format "\n#+BEGIN_EXPORT HTML
-<figure class=\"figure-wrapper\" id=\"%s\">
+    (format "\n<figure class=\"figure-wrapper\" id=\"%s\">
 %s
 %s
 </figure>
-,#+END_EXPORT\n\n" (string-join label "\n") (string-join figs " ") (string-join caption " "))))
+\n\n" (string-join label "\n") (string-join figs " ") (string-join caption " "))))
+
           ;;label (cl-map 'eval body "\n")))
 
 (defun enskip-html () "")
