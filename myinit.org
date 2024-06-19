@@ -1549,6 +1549,9 @@ top-to-bottom):
   double their size (top to bottom after clicking) to have them much
   larger.
   - [X] *Maybe this should only double that specific version?*
+- The second event listener sets foldable sections (i.e. ~:extented:~
+  blocks in an Org file) such that they are folded by default, but
+  become visible upon a click on the title.
 #+begin_src emacs-lisp
 (setq org-html-head
       "
@@ -1589,9 +1592,134 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    var headers = document.querySelectorAll('h1 .extended, h2 .extended, h3 .extended, h4 .extended, h5 .extended, h6 .extended');
+
+    headers.forEach(function (header) {
+        var foldableHeader = header.closest('h1, h2, h3, h4, h5, h6');
+        if (foldableHeader) {
+            foldableHeader.classList.add('foldable-header');
+            var nextElement = foldableHeader.nextElementSibling;
+            var contentToFold = [];
+            while (nextElement && !nextElement.matches('h1, h2, h3, h4, h5, h6')) {
+                contentToFold.push(nextElement);
+                nextElement = nextElement.nextElementSibling;
+            }
+            contentToFold.forEach(function (element) {
+                element.classList.add('folded-content');
+            });
+
+            foldableHeader.addEventListener('click', function () {
+                contentToFold.forEach(function (element) {
+                    if (element.style.display === 'none' || element.style.display == '') {
+                        element.style.display = 'block';
+                    } else {
+                        element.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+});
+
 </script>
 ")
 #+end_src
+
+**** Handling the subfigure DSL together with ~org-ref~
+
+By default the subfigure DSL will break ~org-ref~ citations that
+happen in such figure captions. To fix it we have to hack around a
+bit, by advising the actual ~org-ref~ processing function.
+See [[file:~/phd/thesis.org::#sec:todos:html_export:org_ref_subfigure_dsl]]
+for details.
+
+We use ~advice-add~ with ~:around~ as seen in the below section to first
+perform our DSL replacement, _then_ let ~org-ref~ do its thing and
+finally walk the document again to put all ~<figure>~ tags into a
+~#+BEGIN_EXPORT HTML~ block. This is required, because if we emit the
+expanded DSL into such a block, ~org-ref~ just ignores it.
+This still requires postprocessing using a Nim script,
+[[file:~/phd/code/split_thesis_html.nim]] though.
+
+
+#+begin_src emacs-lisp
+(defun replace-html-tags-in-region (start stop)
+  "Replace @@html:( some text ) @@ with some text in the region from START to STOP.
+Return the total number of characters removed.
+NOTE: The space after `)` and before `@@` MIGHT EXIST in the file!"
+  (interactive "r")  ;; Make the function interactive to select the region
+  (save-excursion
+    (goto-char start)
+    (let ((pattern "@@html:\\([^@]+\\)@@")  ;; Define the regex pattern
+          (total-removed 0))  ;; Initialize the counter
+      (while (re-search-forward pattern stop t)
+        (let ((match-length (- (match-end 0) (match-beginning 0)))
+              (replacement-length (length (match-string 1))))
+          (replace-match (match-string 1) nil nil)
+          (setq total-removed (+ total-removed (- match-length replacement-length)))))
+      (message "Total characters removed: %d" total-removed)
+      total-removed)))
+
+(defun wrap-html-figures-in-org ()
+  "Wrap <figure> HTML blocks inside `#+BEGIN_EXPORT HTML ... #+END_EXPORT` in the current Org buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (condition-case err
+        (while (re-search-forward "<figure class=\"figure-wrapper\"" nil t)
+          (let ((start (match-beginning 0))
+                (figure-count 1))
+            ;; Move forward to find the matching closing </figure> tag
+            (while (and (> figure-count 0)
+                        (re-search-forward "</?figure" nil t))
+              (if (string= (match-string 0) "<figure")
+                  (setq figure-count (1+ figure-count))
+                (setq figure-count (1- figure-count))))
+            (if (zerop figure-count)
+                (let ((end (match-end 0)))
+                  ;; First remove any possible @@html:( ... ) @@ org-ref statements and leave ...
+                  (setq end (- end (replace-html-tags-in-region start end)))
+                  ;; Insert the export block delimiters
+                  (goto-char (+ end 1)) ;; We match `</figure`, so need to insert after closing `>`
+                  (insert "\n#+END_EXPORT")
+                  (goto-char start)
+                  (insert "#+BEGIN_EXPORT HTML\n")
+                  ;; Move point to end to avoid reprocessing the same block
+                  (goto-char (+ end (length "\n#+END_EXPORT"))))
+              (error "Unmatched <figure> tags"))))
+      (error
+       (let ((error-position (point)))
+         (switch-to-buffer (current-buffer))
+         (goto-char error-position)
+         (message "Error: %s" (error-message-string err)))))))
+
+(defun org-html-subfigure-dsl-process (fn backend &optional subtreep)
+  "Wraps around the `org-ref-process-buffer`.
+The idea is that we:
+- before org-ref does its thing, apply the regular subfigure DSL processing
+  (but without inserting #+BEGIN_EXPORT statements for HTML)
+- perform the org-ref processing so that the cite:&foo statements are handled
+  correctly
+- then, wrap the resulting code of the <figure> ... </figure> statements in
+  a #+BEGIN_EXPORT HTML .. #+END_EXPORT environment
+"
+  ;; (switch-to-buffer (current-buffer)) ;; open buffer to investigate
+  (my/org-process-subfigure-dsl backend subtreep) ;; process subfigure DSL
+  ;;(debug)  
+  (apply fn backend subtreep) ;; call the org-ref processing
+  ;;(debug)
+  ;;(switch-to-buffer (current-buffer)) ;; open buffer again to investigate
+  (wrap-html-figures-in-org)
+  ;;(debug)
+  ) ;; wrap the figure envrionments up
+
+#+end_src
+
+#+begin_src emacs-lisp
+(advice-add 'org-ref-process-buffer :around #'org-html-subfigure-dsl-process)
+#+end_src
+
 
 ** Org theming
 
