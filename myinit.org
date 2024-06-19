@@ -1405,7 +1405,7 @@ And for HTML (unfinished + we still need to rename the functions!)
   (ref-html arg))
 
 (defun cite-html (arg)
-  (format "\\cite{%s}" arg))
+  (format "cite:&%s" arg))
 #+end_src
 
 #+RESULTS:
@@ -1438,7 +1438,6 @@ and prepends a ~#~ to make it a file local link.
                                      (format "<a href=\"#%s\">#%s</a>" path (or desc path)))
                                     (t path))))
 #+end_src
-
 
 **** HTML specific settings
 
