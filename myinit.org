@@ -1081,7 +1081,7 @@ Note that we do not perform any replacement on file types other than 'pdf', 'jpg
                       ((member extension '("png" "jpg" "jpeg")) (copy-file-to-figs-dir path relative-path extension))
                       (t path))))
       (message (format "Have filename '%s' extension '%s'" filename extension ))
-      (message (format "Will be copied to: '%s'" new-file ))
+      (message (format "Will be copied to: '%s' and path: %s" new-file path))
       (when (not new-file)
         (message (format "Path exists %s" (file-exists-p (file-name-parent-directory new-file)))))
       (when (and extension (not (string-equal new-file path)))  ;; Only if this is a file, has an extension and is not 'path'      
@@ -1360,12 +1360,12 @@ And for HTML (unfinished + we still need to rename the functions!)
 	                 (mapconcat 'eval body ""))))
 
 (defun includegraphics-html (options path)
-  ;; 1. perform replacement of the actual file we insert
+  ;; 1. perform replacement of the actual file we insert!
   (unless (listp options)
     (error "Expected a list as the first argument, but got '%s'" options))
   (message "Looking at '%s' with options '%s'" path (mapconcat #'prin1-to-string options ", "))
   (message "Last link '%s'" (last options))
-  (let ((new-file (perform-replacement path)))
+  (let ((new-file (perform-replacement (expand-file-name path))))
     (message "Got file '%s' after replace" new-file)
     (format "<img src=\"%s\" %s >" ;; for now ignore size
 	                 new-file (cdr (car options)))))
