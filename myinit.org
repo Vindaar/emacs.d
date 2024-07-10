@@ -1903,10 +1903,25 @@ Some hooks for Go:
 #+RESULTS:
 | subword-mode | rainbow-delimiters-mode |
 
+And enable LSP using eglot.
+#+begin_src emacs-lisp
+(add-hook 'go-mode-hook 'eglot-ensure)
+#+end_src
+
+
 ** Rust
+
+#+begin_src emacs-lisp
+(defun my-rust-mode-hook ()
+  "Custom configurations for Rust mode."
+  (setq tab-width 4)              ; Set tab width to 4 spaces
+  (setq indent-tabs-mode nil)     ; Use spaces for indentation
+  )
+#+end_src
 
 Some hooks for Rust:
 #+BEGIN_SRC emacs-lisp
+(add-hook 'rust-mode-hook 'my-rust-mode-hook)
 (add-hook 'rust-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'rust-mode-hook #'subword-mode)
 #+END_SRC
@@ -1914,7 +1929,15 @@ Some hooks for Rust:
 #+RESULTS:
 | subword-mode | rainbow-delimiters-mode | rust-maybe-initialize-buffer-project |
 
+And enable running ~rustfmt~ on save:
+#+begin_src emacs-lisp
+(setq rust-format-on-save t)
+#+end_src
 
+And enable LSP using eglot.
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook 'eglot-ensure)
+#+end_src
 
 ** Python
 
@@ -2031,3 +2054,46 @@ which strifes for success in the scientific community.
 (add-hook 'julia-mode-hook #'subword-mode)
 #+END_SRC
 
+
+* LSP via ~eglot~
+
+Stolen from: https://gist.github.com/casouri/0ad2c6e58965f6fd2498a91fc9c66501
+See also: https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
+
+#+begin_src emacs-lisp
+(use-package eglot
+  :hook ((rust-mode go-mode) . eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs
+               `(rust-mode . ("rust-analyzer" :initializationOptions
+                              ( :procMacro (:enable t)
+                                :cargo ( :buildScripts (:enable t)
+                                         :features "all"))))))
+;;   (add-to-list 'eglot-server-programs
+;;                        `(go-mode . ("gopls")))
+;;   )
+
+;; (setq-default eglot-workspace-configuration
+;;     '((:gopls .
+;;         ((staticcheck . t)
+;;          (matcher . "CaseSensitive")))))
+
+#+end_src
+
+
+
+#+begin_src emacs-lisp
+(require 'project)
+
+(defun project-find-go-module (dir)
+  (when-let ((root (locate-dominating-file dir "go.mod")))
+    (cons 'go-module root)))
+
+(cl-defmethod project-root ((project (head go-module)))
+  (cdr project))
+
+(add-hook 'project-find-functions #'project-find-go-module)
+#+end_src
+
+#+RESULTS:
+| project-find-go-module | project-try-vc |
