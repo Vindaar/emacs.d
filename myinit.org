@@ -22,7 +22,7 @@ them:
                     ob-nim
                     ;;org
                     ;;org-ac
-                    ein
+                    ;;ein
                     nim-mode
                     ;; pixie-mode
                     undo-tree
@@ -30,13 +30,13 @@ them:
                     gnuplot-mode
                     ;; hy-mode
                     smartparens
-                    cider
+                    ;;cider
                     clojure-mode
                     yasnippet
                     wgrep-helm
-                    spacemacs-theme
+                    ;;spacemacs-theme
                     spaceline
-                    smart-mode-line-powerline-theme
+                    ;; smart-mode-line-powerline-theme
                     rainbow-delimiters
                     monokai-theme
                     julia-mode
@@ -162,6 +162,7 @@ The following contains the settings related to themes.
 ;; (setq powerline-default-separator-dir '(right . left))
 ;; ;; These two lines you really need.
 ;; (setq sml/theme 'respectful)
+;; (setq sml/theme 'powerline)
 ;; (sml/setup)
 
 ;; load spacemacs theme
@@ -172,8 +173,8 @@ The following contains the settings related to themes.
 (spaceline-emacs-theme)
 
 ;; fix broken colors in powerline
-(setq ns-use-srgb-colorspace nil)
-(setq powerline-default-separator 'utf-8)
+;; (setq ns-use-srgb-colorspace nil)
+;; (setq powerline-default-separator 'utf-8)
 
 (load-theme 'monokai t)
 
