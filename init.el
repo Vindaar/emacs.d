@@ -1,3 +1,4 @@
+;; (profiler-start 'cpu)
 ;; enable MELPA package repository
 (require 'package) ;; You might already have this line
 (add-to-list 'package-archives
@@ -20,3 +21,5 @@
 (load custom-file :noerror)
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+
+;; (profiler-stop)
