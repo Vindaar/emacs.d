@@ -2107,6 +2107,12 @@ which strifes for success in the scientific community.
 (add-hook 'julia-mode-hook #'subword-mode)
 #+END_SRC
 
+** SageMath
+
+Let's have ~sage~ blocks use python syntax highlighting:
+#+begin_src emacs-lisp 
+(add-to-list 'org-src-lang-modes '("sage" . python))
+#+end_src
 
 * LSP via ~eglot~
 
