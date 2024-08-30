@@ -2166,3 +2166,19 @@ See also: https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
 
 #+RESULTS:
 | project-find-go-module | project-try-vc |
+* SageMath
+
+We want SageMath blocks to be highlighted like Python:
+
+#+begin_src emacs-lisp
+(add-to-list 'org-src-lang-modes '("sage" . python))
+#+end_src
+
+* GPG
+
+Use GPG encrypted auth info file:
+#+begin_src emacs-lisp
+(setq auth-sources
+    '((:source "~/.authinfo.gpg")))
+#+end_src
+
