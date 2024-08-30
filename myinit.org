@@ -1481,7 +1481,12 @@ the subfigure DSL this breaks ~org-ref~. We need to run a fixup script after pro
   (ref-html arg))
 
 (defun cite-html (arg)
-  (format "cite:&%s" arg))
+  "Important: We insert a space after the citation, because otherwise we might
+generate something like:
+cite:&foo.</figcaption>
+if the citation is directly at the end of the subfigure caption & only has a dot
+without spaces after it."
+  (format "cite:&%s " arg))
 #+end_src
 
 #+RESULTS:
