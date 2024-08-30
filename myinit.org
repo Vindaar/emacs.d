@@ -582,6 +582,11 @@ current relative path given.
 (global-set-key "\M-\\" 'helm-complete-file-name-at-point)
 #+END_SRC
 
+Revert to Helm's previous behavior in helm-buffers, so that we can
+scroll to the ~Recentf~ buffers:
+#+begin_src emacs-lisp
+(setq helm-move-to-line-cycle-in-source nil)
+#+end_src
 
 * Org mode
 
