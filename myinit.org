@@ -61,6 +61,8 @@ them:
                     org-ref
                     helm-bibtex
                     helm-org
+                    helm-org-rifle
+                    ;;dumb-jump
                     ))
 #+END_SRC
 
@@ -2249,3 +2251,33 @@ Use GPG encrypted auth info file:
     '((:source "~/.authinfo.gpg")))
 #+end_src
 
+
+* Dumb-jump
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/local-packages/dumb-jump")
+#+end_src
+
+Use our own fork for now:
+#+begin_src emacs-lisp
+(require 'dumb-jump)
+#+end_src
+
+Configure dumb-jump to be our find definition at point. It allows us
+to use ~M-.~ to find the definition and ~M-,~ to go back to the search point.
+
+#+begin_src emacs-lisp
+;; Activate the xref backend of dumb jump 
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+;; Set it up so that we see completions in a helm buffer
+(setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+(setq completing-read-function #'helm--completing-read-default)
+#+end_src
+
+#+RESULTS:
+: xref-show-definitions-completing-read
+
+Prefer ripgrep by default:
+#+begin_src emacs-lisp
+(setq dumb-jump-prefer-searcher 'rg)
+#+end_src
