@@ -1859,6 +1859,18 @@ font). And unloading does not work great either yet.
   (load-theme 'monokai t))
 #+END_SRC
 
+** Org clock settings
+
+Sometimes I forget to clock in a few minutes later. Let's add a
+function that interactively asks for a time when we clock in.
+
+#+begin_src emacs-lisp
+(defun org-clock-in-with-start-time (start-time)
+  "Clock in with a specific start time."
+  (interactive (list (org-read-date t t)))
+  (org-clock-in nil start-time))
+#+end_src
+
 * Programming languages
 
 This section contains settings, which are related to different
