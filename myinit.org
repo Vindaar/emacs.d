@@ -1871,6 +1871,49 @@ function that interactively asks for a time when we clock in.
   (org-clock-in nil start-time))
 #+end_src
 
+** Org Capture
+
+#+begin_src emacs-lisp
+(setq org-default-notes-file (concat org-directory "/capture/notes.org"))
+#+end_src
+
+And assign some key bindings for org-store-link, org-capture and
+org-agenda.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+#+end_src
+
+#+RESULTS:
+: org-capture
+
+And now adjust the capture templates:
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/org/journal.org" "Tasks")
+         "* TODO %?\n%T \n%a")
+        ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
+         "* %?\n%T\n%a")
+        ("w" "Work related templates")
+        ("wn" "Work note" entry (clock)
+         "* %?\n%T\nContext: %i\nRecorded while at: %a")
+        ("wt" "Work TODO" entry (clock)
+         "* TODO %?\n%T\nContext: %i\nRecorded while at: %a")
+        ("q" "Quick note" entry nil
+         "* %?\n%T\n%a")
+        ("r" "Random note" entry 
+         "* %?\n%T\n%a")
+        ("m" "Movie" item (file+olp "~/org/anime_videogames.org" "Movies" "To watch")
+         "- %?")
+        ("s" "Show" item (file+olp "~/org/anime_videogames.org" "TV shows" "To watch")
+         "- %?")
+        ("b" "Book" item (file+olp "~/org/anime_videogames.org" "Books" "To read")
+         "- %?")
+      ))
+#+end_src
+
 * Programming languages
 
 This section contains settings, which are related to different
