@@ -588,6 +588,18 @@ scroll to the ~Recentf~ buffers:
 (setq helm-move-to-line-cycle-in-source nil)
 #+end_src
 
+Use ~rg~ for helm grep:
+#+begin_src emacs-lisp
+;;(setq helm-grep-ag-command "rg --color=always --colors 'match:fg:black' --colors 'match:bg:yellow' --smart-case --no-heading --line-number %s %s %s")
+(setq helm-grep-ag-command "rg --color=always --smart-case --search-zip --no-heading --line-number %s -- %s %s")
+;;(setq helm-grep-ag-pipe-cmd-switches '("--colors 'match:fg:black'" "--colors 'match:bg:yellow'"))
+(setq helm-grep-ag-pipe-cmd-switches nil)
+;;(setq helm-grep-default-command "rg --color=always --colors 'match:fg:black' --colors 'match:bg:yellow' --smart-case --no-heading --line-number %s %s %s")
+(setq helm-grep-default-command "rg --color=always -a -d skip %e -n%cH -e %p %f")
+#+end_src
+
+
+
 * Org mode
 
 #+BEGIN_SRC emacs-lisp
