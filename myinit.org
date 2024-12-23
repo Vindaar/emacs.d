@@ -213,6 +213,7 @@ Set the regex builder syntax from 'read' to 'string' so that we don't
 have to use double backslash.
 #+BEGIN_SRC emacs-lisp
 (setq reb-re-syntax 'string)
+(setq reb-re-syntax 'read)
 #+END_SRC
 
 
