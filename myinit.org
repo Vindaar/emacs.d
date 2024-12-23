@@ -2537,3 +2537,26 @@ Prefer ripgrep by default:
 #+begin_src emacs-lisp
 (setq dumb-jump-prefer-searcher 'rg)
 #+end_src
+
+* Random useful elisp functions
+
+Useful opposite of ~fill-paragraph~:
+#+begin_src emacs-lisp
+(defun unfill-paragraph ()
+  "Replace newline chars in current paragraph by single spaces.
+This command does the reverse of `fill-paragraph'."
+  (interactive)
+  (let ((fill-column 90002000))
+    (fill-paragraph nil)))
+ 
+(defun unfill-region (start end)
+  "Replace newline chars in region by single spaces.
+This command does the reverse of `fill-region'."
+  (interactive "r")
+  (let ((fill-column 90002000))
+    (fill-region start end))) 
+#+end_src
+
+#+RESULTS:
+: unfill-region
+
