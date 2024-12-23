@@ -488,32 +488,61 @@ and the DVI -> SVG backend.
  =dvilualatex= as a compiler and use regular =dvi= as input, but this
  way works well (we still use =lualatex= for regular compilation of documents).
 #+begin_src emacs-lisp
-(setq org-preview-latex-process-alist
-      '((dvipng :programs
-                ("xelatex" "dvipng")
-                :description "dvi > png" :message "you need to install the programs: latex and dvipng." :image-input-type "xdv" :image-output-type "png" :image-size-adjust
-                (1.0 . 1.0)
-                :latex-compiler
-                ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
-                :image-converter
-                ("dvipng -D %D -T tight -o %O %f"))
-        (dvisvgm :programs
-                 ("xelatex" "dvisvgm")
-                 :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
-                 (1.7 . 1.5)
-                 :latex-compiler
-                 ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
-                 :image-converter
-                 ("dvisvgm %f -n -b min -c %S -o %O"))
-        (imagemagick :programs
-                     ("xelatex" "convert")
-                     :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :image-size-adjust
-                     (1.0 . 1.0)
-                     :latex-compiler
-                     ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
-                     :image-converter
-                     ("convert -density %D -trim -antialias %f -quality 100 %O"))))
-(setq org-preview-latex-default-process 'dvisvgm)
+;;(setq org-preview-latex-process-alist
+;;      '((dvipng :programs
+;;                ("xelatex" "dvipng")
+;;                :description "dvi > png" :message "you need to install the programs: latex and dvipng." :image-input-type "xdv" :image-output-type "png" :image-size-adjust
+;;                (1.0 . 1.0)
+;;                :latex-compiler
+;;                ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                :image-converter
+;;                ("dvipng -D %D -T tight -o %O %f"))
+;;        (dvisvgm :programs
+;;                 ("xelatex" "dvisvgm")
+;;                 :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
+;;                 (1.7 . 1.5)
+;;                 :latex-compiler
+;;                 ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                 :image-converter
+;;                 ("dvisvgm %f -n -b min -c %S -o %O"))
+;;        (imagemagick :programs
+;;                     ("xelatex" "convert")
+;;                     :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :image-size-adjust
+;;                     (1.0 . 1.0)
+;;                     :latex-compiler
+;;                     ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                     :image-converter
+;;                     ("convert -density %D -trim -antialias %f -quality 100 %O"))))
+;; (setq org-preview-latex-default-process 'dvisvgm)
+
+;; (setq org-latex-preview-process-alist 
+;;       '((dvipng :programs
+;;                 ("xelatex" "dvipng")
+;;                 :description "dvi > png" :message "you need to install the programs: latex and dvipng." :image-input-type "xdv" :image-output-type "png" :image-size-adjust
+;;                 (1.0 . 1.0)
+;;                 :latex-compiler
+;;                 ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                 :image-converter
+;;                 ("dvipng -D %D -T tight -o %O %f"))
+;;         (dvisvgm :programs
+;;                  ("xelatex" "dvisvgm")
+;;                  :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
+;;                  (1.7 . 1.5)
+;;                  :latex-compiler
+;;                  ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                  :image-converter
+;;                  ("dvisvgm %f -n -b min -c %S -o %O"))
+;;         (imagemagick :programs
+;;                      ("xelatex" "convert")
+;;                      :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :image-size-adjust
+;;                      (1.0 . 1.0)
+;;                      :latex-compiler
+;;                      ("xelatex --shell-escape -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                      :image-converter
+;;                      ("convert -density %D -trim -antialias %f -quality 100 %O"))))
+;; 
+;; ;; For the new preview:
+;; (setq org-latex-preview-process-default 'dvisvgm)
 #+end_src
 
 * Helm
@@ -604,13 +633,124 @@ Use ~rg~ for helm grep:
 
 * Org mode
 
+** Switch to new org-latex-preview
+
+https://abode.karthinks.com/org-latex-preview/
+
+I'm following the steps outlined there:
+#+begin_quote
+1. Uninstall any version of Org you might have that’s not the one
+   built into Emacs: M-x package-delete ⮐ org. This might give you
+   some trouble because of packages that depend on org. If you’re
+   using the built-in Org library, you can skip this step.
+2. If your Emacs uses native compilation (native-comp-available-p),
+   delete the eln-cache for Org files. These should be in one of the
+   directories in the list native-comp-eln-load-path.
+3. Install the above version of Org with package-vc-install. Run
+   (package-vc-install '(org-mode :url
+   "https://code.tecosaur.net/tec/org-mode")) Note: We call the
+   package org-mode and not org, otherwise we wouldn’t be able to
+   delete it afterwards with package-delete due to dependencies of
+   other packages on org.
+4. Locate the installation path (~/.emacs.d/elpa/org-mode/lisp) or
+   equivalent, and run make inside the directory.
+5. In your configuration file, you can load Org via
+   (use-package org :load-path "~/.emacs.d/elpa/org-mode/lisp/")
+#+end_quote
+
+1: I use the built in Org nowadays.
+2. Yes, I have native compilation. Will delete Org files
+   [[file:eln-cache/29.4-4f53a1f5/]]
+3.
+#+begin_src emacs-lisp
+;; (package-vc-install '(org-mode :url "https://code.tecosaur.net/tec/org-mode"))
+;; (package-vc-install '(org-mode :url "/home/basti/src/org-mode-latex-preview"))
+;;(package-vc-install '(:url "~/src/org-mode-latex-preview/"))
+#+end_src
+4. Note: It equires ~libtree-sitter~, so install:
+   #+begin_src sh
+xbps-install -S tree-sitter tree-sitter-devel
+   #+end_src
+  before running ~make~! 
+5. Adjust the load path: NOTE: We actually do this in [[file:init.el]]
+   before we use ~org-babel-load-file~ to not conflict the two versions!
+   #+begin_src emacs-lisp
+;; (use-package org :load-path "~/.emacs.d/elpa/org-mode/lisp/")
+   #+end_src
+
+   #+RESULTS:
+
+Commit with changes to Org-News:
+https://code.tecosaur.net/tec/org-mode/commit/33c563da2605067488f6a10ae05f09ec30839204
+https://code.tecosaur.net/tec/org-mode/src/branch/dev/etc/ORG-NEWS
+
+Configure the new features:
+
+~org-latex-preview-auto-mode~
+#+begin_quote
+When this mode is turned on, LaTeX preview overlays in the buffer can
+be temporarily disabled by moving the cursor into them.  Moving the
+cursor out will display the LaTeX preview image overlay again.
+Additionally, editing LaTeX fragments that have previews will cause
+the preview images to be updated.
+#+end_quote
+- [ ] Enable on Org mode loading
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'org-latex-preview-auto-mode)
+#+end_src
+  
+
+#+RESULTS:
+: t
+
+#+begin_quote
+If the option ~org-latex-preview-auto-track-inserts~ is non-nil (which
+see), previews for LaTeX fragments will be auto-generated as you type.
+#+end_quote
+#+begin_src emacs-lisp
+(setq org-latex-preview-auto-track-inserts t)
+#+end_src
+
+#+RESULTS:
+: t
+
+*NOTE*: <2024-11-11 Mon 16:22>
+I've been trying to set this up for about an hour now. I finally
+managed to get it to ~mostly work, but there are issues:
+- automatically switching between preview and TeX source does not
+  work, despite ~org-latex-preview-auto-mode~ set
+  -> Works now. I misunderstood ~org-latex-preview-auto-mode~. I
+  thought it was a variable and not a minor mode.
+- when there is an error in a fragment, using org-latex-preview does
+  not toggle the preview back to source code
+  -> This is not needed with the auto mode working
+- it only supports ~pdflatex~, so no unicode math or similar
+  -> This is a big shame
+- conflicts with our export settings, because it relies on the same
+  functionality
+  -> I guess we could fix that.
+
+We _can_ use LuaLaTeX, but that disables 'precompilation'. I don't
+quite understand what that implies though. Seems to preprocess the
+header or something?
+
+Anyhow, it's better than the previous preview logic.
+
+** General Org settings
+
 #+BEGIN_SRC emacs-lisp
-(require 'org)
+; (require 'org)
 (require 'org-ref)
 (require 'org-ref-helm)
 (require 'doi-utils)
 (require 'helm-org)
 #+END_SRC
+
+Set the TeX compiler Org uses to Lualatex:
+#+begin_src emacs-lisp
+(setq org-latex-compiler "lualatex")
+#+end_src
 
 Disable the =C-'= binding for org-mode, since this conflicts with
 avy-goto-char-2 and C-, (=org-cycle-agenda-files=) since it conflicts
