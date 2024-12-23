@@ -20,6 +20,7 @@
 #+LATEX_HEADER: \usepackage[labelformat=simple]{subcaption}
 
 # Overwrite the default text color in use for minted!
+#+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usepackage{xcolor}
 #+LATEX_HEADER: \definecolor{defaultMintedColor}{HTML}{808080}
 # Well, this breaks the coloring of the line numbers..........
