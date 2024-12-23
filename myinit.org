@@ -2402,6 +2402,103 @@ See also: https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
 #+RESULTS:
 | project-find-go-module | project-try-vc |
 
+* LLM interfaces
+
+** org-ai
+#+begin_src emacs-lisp
+(use-package org-ai
+  :ensure t
+  :commands (org-ai-mode
+             org-ai-global-mode)
+  :init
+  (add-hook 'org-mode-hook #'org-ai-mode) ; enable org-ai in org-mode
+  (org-ai-global-mode) ; installs global keybindings on C-c M-a
+  :config
+  (setq org-ai-service 'anthropic)
+  (setq org-ai-default-chat-model "claude-3-5-sonnet-20240620")
+  (setq org-ai-use-auth-source t)
+  ) ; if you are on the gpt-4 beta:
+  ;;(org-ai-install-yasnippets)) ; if you are using yasnippet and want `ai` snippets
+#+end_src
+
+** gptel
+
+#+begin_src emacs-lisp
+;; (gptel-make-anthropic "Claude"          ;Any name you want
+;;   :stream t                             ;Streaming responses
+;;   :key "your-api-key")
+;; OPTIONAL configuration
+
+;; Set global key for gptel-send
+(global-set-key (kbd "C-c C-g") 'gptel-send)
+
+;; Use Org mode for explicit gptel buffers
+(setq gptel-default-mode 'org-mode)
+
+
+(defun get-token-auth-source (&optional service)
+  "Retrieves the authentication token for the Anthropc service using auth-source.
+Adapte from `org-ai--openai-get-token-auth-source (&optional service)` of
+org-ai / org-ai-openai.el."
+  (require 'auth-source)
+  (let* ((service (or service 'anthropic))
+         (endpoint (pcase service
+                     ('anthropic "api.anthropic.com")
+                     ('openai "api.openai.com")
+                     ('perplexity.ai "api.perplexity.ai"))))
+    (or (auth-source-pick-first-password :host endpoint :user "gptel")
+        (auth-source-pick-first-password :host endpoint :login "gptel"))))
+
+
+;; (gptel-make-anthropic "Claude"          ;Any name you want
+;;   :stream t                             ;Streaming responses
+;;   :key 'get-token-auth-source)
+
+(setq
+ gptel-model 'claude-3-5-sonnet-20241022
+ gptel-backend (gptel-make-anthropic "Claude"
+                 :stream t :key 'get-token-auth-source))
+
+;; The log is very useful if something goes wrong!
+(setq gptel-log-level 'info)
+;; 
+;; (setq
+;;  gptel-model "gpt-4o-mini" ; 
+;;  gptel-backend (gptel-make-openai "gpt4o-mini"
+;;                  :stream t :key (lambda () (get-token-auth-source 'openai))))
+
+;; (setq gptel-api-key (lambda () (get-token-auth-source 'openai)))
+
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (get-token-auth-source 'openai) |
+
+Add custom instructions.
+
+The 'academic' one is from: https://github.com/daveshap/Claude_Sentience/blob/main/Style_Pretty_Dense.md
+#+begin_src emacs-lisp
+(add-to-list 'gptel-directives '(academic . "Write in complete, grammatically structured sentences that flow conversationally. Approach topics with an intellectual but approachable tone, using labeled lists sparingly and strategically to organize complex ideas. Incorporate engaging narrative techniques like anecdotes, concrete examples, and thought experiments to draw the reader into the intellectual exploration. Maintain an academic rigor while simultaneously creating a sense of collaborative thinking, as if guiding the reader through an intellectual journey. Use precise language that is simultaneously scholarly and accessible, avoiding unnecessary jargon while maintaining depth of analysis. Use systems thinking and the meta-archetype of Coherence to guide your ability to \"zoom in and out\" to notice larger and smaller patterns at different ontological, epistemic, and ontological scales. Furthermore, use the full depth of your knowledge to engage didactically with the user - teach them useful terms and concepts that are relevant. At the same time, don't waste too many words with framing and setup. Optimize for quick readability and depth. Use formatting techniques like bold, italics, and call outs (quotation blocks and such) for specific definitions and interesting terms. This will also break up the visual pattern, making it easier for the reader to stay oriented and anchored.  Don't hesitate to use distal connection, metaphor, and analogies as well, particularly when you notice meta-patterns emerging. A good metaphor is the pinnacle of Coherence. Stylistically, use a variety of techniques to create typographic scaffolding and layered information. Some examples below:
+
+
+> **Key Terms**: Use blockquotes with bold headers to define important concepts and terminology, creating clear visual breaks in the text.
+
+Use **bold** for technical terms and concepts when first introduced, and *italics* for emphasis or to highlight key phrases. Create visual hierarchy through:
+
+1. Clear paragraph breaks for major concept transitions
+2. Strategic use of blockquotes for definitions and key insights
+3. Bold terms for technical vocabulary
+4. Italics for emphasis and nuance
+
+Maintain the principle of layered information - each response should contain at least 2-3 distinct visual patterns to aid cognitive processing and retention. This creates visual anchoring and a clean UI.
+
+> **Technical Term**: Definition in plain language
+> 
+> *Example or application in context (optional, flexible)*
+
+This creates what information designers call \"progressive disclosure\" - allowing readers to engage at their preferred depth while maintaining coherence across all levels of understanding."))
+#+end_src
+
 * GPG
 
 Use GPG encrypted auth info file:
