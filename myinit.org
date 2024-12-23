@@ -2588,3 +2588,20 @@ https://github.com/kickingvegas/casual
 
 #+RESULTS:
 : casual-dired-search-replace-tmenu
+
+* Pandoc as Org -> Markdown exporter
+
+The default Markdown exporter present in Org mode targets the very
+old, initial Markdown spec. Not the modern typically present versions:
+https://orgmode.org/manual/Markdown-Export.html
+https://daringfireball.net/projects/markdown/
+(going back to John Gruber and Aaron Swartz in 2004).
+
+Activate a table of contents by default:
+#+begin_src emacs-lisp
+(setq org-pandoc-options
+      '((standalone . t)
+        (toc . t)           ; Enable table of contents
+        (toc-depth . 3)     ; Specify TOC depth (headers to include)
+        ))
+#+end_src
