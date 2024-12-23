@@ -16,6 +16,14 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+
+
+;; Load custom Org first
+(use-package org :load-path "~/.emacs.d/elpa/org-mode/lisp/")
+
+;; (setq org-latex-preview t)
+(setq org-latex-preview-auto-track-inserts t)
+
 ;; load the custom settings created by emacs automatically
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file :noerror)
