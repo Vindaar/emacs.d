@@ -2069,6 +2069,15 @@ And now adjust the capture templates:
 #+end_src
 
 
+
+
+** Org babel for python
+
+Set the python installation to a virtualenv:
+#+begin_src emacs-lisp
+(setq org-babel-python-command "~/opt/python3/bin/python3")
+#+end_src
+
 * Programming languages
 
 This section contains settings, which are related to different
