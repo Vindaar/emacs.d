@@ -2560,3 +2560,31 @@ This command does the reverse of `fill-region'."
 #+RESULTS:
 : unfill-region
 
+* Casual
+
+Transient interfaces for a variety of packages
+https://github.com/kickingvegas/casual
+
+#+begin_src emacs-lisp
+(require 'casual)
+#+end_src
+
+#+begin_src emacs-lisp
+(require 'casual-calc)
+(keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)
+(keymap-set calc-alg-map "C-o" #'casual-calc-tmenu)
+#+end_src
+
+#+RESULTS:
+: casual-calc-tmenu
+
+
+#+begin_src emacs-lisp
+(require 'casual-dired) ; optional if using autoloaded menu
+(keymap-set dired-mode-map "C-o" #'casual-dired-tmenu)
+(keymap-set dired-mode-map "s" #'casual-dired-sort-by-tmenu) ; optional
+(keymap-set dired-mode-map "/" #'casual-dired-search-replace-tmenu) ; optional
+#+end_src
+
+#+RESULTS:
+: casual-dired-search-replace-tmenu
