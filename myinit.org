@@ -63,6 +63,7 @@ them:
                     helm-org
                     helm-org-rifle
                     ;;dumb-jump
+                    casual
                     ))
 #+END_SRC
 
