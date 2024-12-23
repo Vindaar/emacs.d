@@ -2325,9 +2325,11 @@ And finally the same hooks for the CIDER REPL:
 Hooks and settings for Nim lang, a sweet
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'nim-mode-hook #'nimsuggest-mode)
+;; (add-hook 'nim-mode-hook #'nimsuggest-mode)
+;; (remove-hook 'nim-mode-hook #'nimsuggest-mode)
 (add-hook 'nim-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'nim-mode-hook #'subword-mode)
+
 #+END_SRC
 
 ** Julia
