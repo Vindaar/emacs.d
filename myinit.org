@@ -815,7 +815,7 @@ Define additional org mode faces
 
 Add some files to org-agenda
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files '("~/org/journal.org"))
+(setq org-agenda-files '("~/org/journal.org" "~/org/void_settings.org"))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
 
