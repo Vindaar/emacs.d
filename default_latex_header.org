@@ -79,19 +79,22 @@
 # The default *I think* is 1.2
 #+LATEX_HEADER: \linespread{1.5} % change line spacing to be a bit larger. TODO: find good value!
 
+# Only use STIX mode & DejaVu fallback if we compile with
+# LuaLaTeX. For Org mode previews we use XeLaTeX, which causes
+# problems when compiling snippets.
+#+LATEX_HEADER: \usepackage{iftex}
+#+LATEX_HEADER: \ifluatex
 #+LATEX_HEADER: \usepackage{fontspec}
-#+LATEX_HEADER: 
 #+LATEX_HEADER: \directlua{
 #+LATEX_HEADER:   luaotfload.add_fallback(
 #+LATEX_HEADER:   "FallbackFonts",
 #+LATEX_HEADER:   {
 #+LATEX_HEADER:         "DejaVu Serif:mode=harf;",
 #+LATEX_HEADER:         "DejaVu Sans Mono:mode=harf;",
-#+LATEX_HEADER:         % we could add many more fonts here optionally!
 #+LATEX_HEADER:     }
 #+LATEX_HEADER:   )
 #+LATEX_HEADER: }
-#+LATEX_HEADER: 
 #+LATEX_HEADER: \setmainfont{STIXTwoText}[RawFeature={fallback=FallbackFonts}]
 #+LATEX_HEADER: \setmathfont{STIXTwoMath-Regular}[RawFeature={fallback=FallbackFonts}]
 #+LATEX_HEADER: \setmonofont{Inconsolata}[RawFeature={fallback=FallbackFonts}]
+#+LATEX_HEADER: \fi
