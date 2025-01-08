@@ -2505,20 +2505,22 @@ See also: https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
 * LLM interfaces
 
 ** org-ai
+
+We don't use org-ai at all really. Have moved fully to ~gptel~.
 #+begin_src emacs-lisp
-(use-package org-ai
-  :ensure t
-  :commands (org-ai-mode
-             org-ai-global-mode)
-  :init
-  (add-hook 'org-mode-hook #'org-ai-mode) ; enable org-ai in org-mode
-  (org-ai-global-mode) ; installs global keybindings on C-c M-a
-  :config
-  (setq org-ai-service 'anthropic)
-  (setq org-ai-default-chat-model "claude-3-5-sonnet-20240620")
-  (setq org-ai-use-auth-source t)
-  ) ; if you are on the gpt-4 beta:
-  ;;(org-ai-install-yasnippets)) ; if you are using yasnippet and want `ai` snippets
+;; (use-package org-ai
+;;   :ensure t
+;;   :commands (org-ai-mode
+;;              org-ai-global-mode)
+;;   :init
+;;   (add-hook 'org-mode-hook #'org-ai-mode) ; enable org-ai in org-mode
+;;   (org-ai-global-mode) ; installs global keybindings on C-c M-a
+;;   :config
+;;   (setq org-ai-service 'anthropic)
+;;   (setq org-ai-default-chat-model "claude-3-5-sonnet-20240620")
+;;   (setq org-ai-use-auth-source t)
+;;   ) ; if you are on the gpt-4 beta:
+;;   ;;(org-ai-install-yasnippets)) ; if you are using yasnippet and want `ai` snippets
 #+end_src
 
 ** gptel
