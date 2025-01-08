@@ -2284,6 +2284,21 @@ And enable LSP using eglot.
 
 ** Rust
 
+Use ~rust-ts-mode~ based on native treesitter.
+Note: might need to run:
+#+begin_src emacs-lisp
+;;(treesit-install-language-grammar 'rust)
+#+end_src
+interactively and simply use all the values the command
+proposes. Installs the treesitter lib for Rust in the emacs subdirectory.
+
+#+begin_src emacs-lisp
+(use-package rust-mode
+  :init
+  (setq rust-mode-treesitter-derive t))
+#+end_src
+
+
 #+begin_src emacs-lisp
 (defun my-rust-mode-hook ()
   "Custom configurations for Rust mode."
@@ -2310,6 +2325,14 @@ And enable running ~rustfmt~ on save:
 And enable LSP using eglot.
 #+begin_src emacs-lisp
 (add-hook 'rust-mode-hook 'eglot-ensure)
+#+end_src
+
+Disable squiggly lines under what rust-analyzer considers wrong (I'm
+sorry, but this is ugly and distracting and >half the time not accurate):
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook
+          (lambda ()
+            (setq-local eglot-ignored-server-capabilities '(:diagnostics))))
 #+end_src
 
 ** Python
