@@ -2295,6 +2295,18 @@ And enable LSP using eglot.
 (add-hook 'go-mode-hook 'eglot-ensure)
 #+end_src
 
+And run ~gofmt~ and fix imports on save:
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'gofmt-before-save)
+(setq gofmt-command "goimports")
+#+end_src
+
+#+RESULTS:
+: goimports
+
+Reference: See the instructions in the README here:
+https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+
 
 ** Rust
 
