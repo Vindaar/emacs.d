@@ -2552,6 +2552,8 @@ We don't use org-ai at all really. Have moved fully to ~gptel~.
 ** gptel
 
 #+begin_src emacs-lisp
+(require 'gptel)
+
 ;; (gptel-make-anthropic "Claude"          ;Any name you want
 ;;   :stream t                             ;Streaming responses
 ;;   :key "your-api-key")
