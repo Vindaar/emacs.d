@@ -623,6 +623,16 @@ and the DVI -> SVG backend.
 ;; (setq org-latex-preview-process-default 'dvisvgm)
 #+end_src
 
+
+Add siunitx and unicode-math always so that these are available in the
+context of ~org-latex-preview~: 
+#+begin_src emacs-lisp
+(nconc org-latex-default-packages-alist
+       '(("" "siunitx" t)
+         ("" "unicode-math" t ("lualatex" "xetex"))))
+#+end_src
+~nconc~ just appends to a list.
+
 * Helm
 
 Helm. Really an emacs package in a league of its own:
