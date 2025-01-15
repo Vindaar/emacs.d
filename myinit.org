@@ -466,9 +466,8 @@ And now choose it for the window spliting function:
 
 Set the emacs exec-path to the normal PATH variable.
 #+BEGIN_SRC emacs-lisp
-(setenv "PATH" (getenv "PATH"))
+;;(setenv "PATH" (getenv "PATH"))
 #+END_SRC
-
 
 ** Unicode
 
