@@ -739,12 +739,27 @@ I'm following the steps outlined there:
 1: I use the built in Org nowadays.
 2. Yes, I have native compilation. Will delete Org files
    [[file:eln-cache/29.4-4f53a1f5/]]
-3.
+3. First clone the repository
+   #+begin_src 
+cd ~/src
+git clone https://code.tecosaur.net/tec/org-mode
+mv org-mode org-mode-latex-preview
+   #+end_src
+   and now install it as an emacs package (use the last entry;
+   commented out to not have it run on every start!):
 #+begin_src emacs-lisp
 ;; (package-vc-install '(org-mode :url "https://code.tecosaur.net/tec/org-mode"))
 ;; (package-vc-install '(org-mode :url "/home/basti/src/org-mode-latex-preview"))
-;;(package-vc-install '(:url "~/src/org-mode-latex-preview/"))
 #+end_src
+
+#+RESULTS:
+: t
+   After run the make command *in the emacs subdir*
+   #+begin_src 
+cd ~/.emacs.d/elpa/org-mode
+make
+   #+end_src
+
 4. Note: It equires ~libtree-sitter~, so install:
    #+begin_src sh
 xbps-install -S tree-sitter tree-sitter-devel
