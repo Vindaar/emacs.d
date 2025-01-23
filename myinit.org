@@ -2670,6 +2670,36 @@ Maintain the principle of layered information - each response should contain at 
 This creates what information designers call \"progressive disclosure\" - allowing readers to engage at their preferred depth while maintaining coherence across all levels of understanding."))
 #+end_src
 
+
+We can configure gptel in Org mode to work by the hierarchical
+structure of the document. Each hierarchy / branch in a file is one
+conversation.
+
+NOTE: The ~gptel-org-branching-context~ is *only set* for each
+buffer. So we cannot set it here for _all_ buffers. This is good
+though, because it means we don't break old LLM discussions in Org
+files.
+
+To define it in a buffer, either call ~M-x add-file-local-variable~
+and then select ~gptel-org-branching-context~ and set it to ~t~ or
+directly write:
+#+begin_src
+# Local Variables:
+# gptel-org-branching-context: t
+# End:
+#+end_src
+at the end of the Org file.
+NOTE: At the moment I can't get it to work correctly.
+
+#+begin_src emacs-lisp
+;; (setq gptel-org-branching-context t)
+(setf (alist-get 'org-mode gptel-prompt-prefix-alist) "@user\n")
+(setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n")
+#+end_src
+
+#+RESULTS:
+: @assistant
+
 * GPG
 
 Use GPG encrypted auth info file:
