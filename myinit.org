@@ -2594,6 +2594,7 @@ org-ai / org-ai-openai.el."
          (endpoint (pcase service
                      ('anthropic "api.anthropic.com")
                      ('openai "api.openai.com")
+                     ('deepseek "api.deepseek.com")
                      ('perplexity.ai "api.perplexity.ai"))))
     (or (auth-source-pick-first-password :host endpoint :user "gptel")
         (auth-source-pick-first-password :host endpoint :login "gptel"))))
@@ -2617,6 +2618,17 @@ org-ai / org-ai-openai.el."
 ;;                  :stream t :key (lambda () (get-token-auth-source 'openai))))
 
 ;; (setq gptel-api-key (lambda () (get-token-auth-source 'openai)))
+
+(setq gptel-deepseek-api-key (lambda () (get-token-auth-source 'deepseek)))
+
+;; Register DeepSeek
+;; DeepSeek offers an OpenAI compatible API
+(gptel-make-openai "DeepSeek"       ;Any name you want
+  :host "api.deepseek.com"
+  :endpoint "/chat/completions"
+  :stream t
+  :key 'gptel-deepseek-api-key
+  :models '(deepseek-chat deepseek-coder deepseek-reasoner))
 
 #+end_src
 
