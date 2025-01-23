@@ -2504,6 +2504,11 @@ Let's have ~sage~ blocks use python syntax highlighting:
 (add-to-list 'org-src-lang-modes '("sage" . python))
 #+end_src
 
+And add the ~.sage~ extension to the files that automatically load python-mode.
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.sage\\'" . python-mode))
+#+end_src
+
 * LSP via ~eglot~
 
 Stolen from: https://gist.github.com/casouri/0ad2c6e58965f6fd2498a91fc9c66501
@@ -2595,14 +2600,19 @@ org-ai / org-ai-openai.el."
                      ('anthropic "api.anthropic.com")
                      ('openai "api.openai.com")
                      ('deepseek "api.deepseek.com")
-                     ('perplexity.ai "api.perplexity.ai"))))
+                     ('perplexity.ai "api.perplexity.ai")
+                     ('gemini "generativelanguage.googleapis.com"))))
     (or (auth-source-pick-first-password :host endpoint :user "gptel")
         (auth-source-pick-first-password :host endpoint :login "gptel"))))
 
+(defun get-gemini-api-token ()
+  (get-token-auth-source 'gemini))
 
 ;; (gptel-make-anthropic "Claude"          ;Any name you want
 ;;   :stream t                             ;Streaming responses
 ;;   :key 'get-token-auth-source)
+
+(gptel-make-gemini "Gemini" :key 'get-gemini-api-token :stream t)
 
 (setq
  gptel-model 'claude-3-5-sonnet-20241022
