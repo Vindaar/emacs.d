@@ -2371,6 +2371,15 @@ sorry, but this is ugly and distracting and >half the time not accurate):
             (setq-local eglot-ignored-server-capabilities '(:diagnostics))))
 #+end_src
 
+
+#+begin_src emacs-lisp
+(setq eglot-workspace-configuration
+      '(:rust-analyzer
+        (:checkOnSave (:enable t)
+         :procMacro (:enable t)
+         :cargo (:loadOutDirsFromCheck t))))
+#+end_src
+
 ** Python
 
 Some sensible settings for Python. Activating python-mode per default
