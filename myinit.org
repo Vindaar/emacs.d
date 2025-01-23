@@ -2798,6 +2798,10 @@ https://orgmode.org/manual/Markdown-Export.html
 https://daringfireball.net/projects/markdown/
 (going back to John Gruber and Aaron Swartz in 2004).
 
+*IMPORTANT*: By default the Markdown option is not shown in the
+~org-export~ window. We can just invoke it manually from an Org file
+using ~org-pandoc-export-as-markdown~!
+
 Activate a table of contents by default:
 #+begin_src emacs-lisp
 (setq org-pandoc-options
