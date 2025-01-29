@@ -318,6 +318,12 @@ horizontal split or vice versa:
 (global-set-key (kbd "C-x |") 'transpose-frame)
 #+END_SRC
 
+Set keybinding for ~window-swap-state~. The equivalent of rotating
+windows in a tiling WM:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-S-j") 'window-swap-states)
+#+end_src
+
 Add global hook to always remove trailing whitespaces in buffers upon
 saving them. Note: in some cases, e.g. Markdown this might not be
 desired, since a double whitespace at the end of a line has special
