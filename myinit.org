@@ -2686,6 +2686,15 @@ buffer. So we cannot set it here for _all_ buffers. This is good
 though, because it means we don't break old LLM discussions in Org
 files.
 
+*UPDATE*: <2025-01-27 Mon 17:36>
+What *does* work is to evoke:
+#+begin_comment
+#+begin_src emacs-lisp
+(setq gptel-org-branching-context t)
+#+end_src
+#+end_comment
+inside of the buffer. Then it ends up sticking and the hierarchy logic works.
+
 To define it in a buffer, either call ~M-x add-file-local-variable~
 and then select ~gptel-org-branching-context~ and set it to ~t~ or
 directly write:
