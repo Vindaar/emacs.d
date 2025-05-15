@@ -2216,6 +2216,138 @@ Set the python installation to a virtualenv:
 (setq org-babel-python-command "~/opt/python3/bin/python3")
 #+end_src
 
+
+** Replace local links by Github links
+
+Actually written by Gemini 2.5 Pro (May 2025 version).
+
+See [[id:8d06efd8-7444-4858-b356-b710734badc7][org_link_export_convert_to_github_links.org]].
+
+#+begin_src elisp
+(defcustom my-org-github-link-presets
+  '(("My Project Foo" . ("~/projects/foo/" "https://github.com/username/foo" "main"))
+    ("Work Project Bar" . ("/work/src/project-bar/" "https://github.com/company/project-bar" "develop")))
+  "Alist of preset configurations for converting local links to GitHub.
+Each element is (NAME . (LOCAL-REPO-ROOT-PATH GITHUB-BASE-URL COMMIT-ISH)).
+LOCAL-REPO-ROOT-PATH can use '~' for home directory and will be normalized.
+GITHUB-BASE-URL should be the base URL like 'https://github.com/user/repo' (no trailing slash).
+COMMIT-ISH is the branch, tag, or commit hash like 'main'."
+  :type '(alist :key-type string
+                :value-type (list string string string))
+  :group 'org)
+
+(defun my-org-convert-local-links-to-github ()
+  "Convert local Org file links to GitHub URLs with line numbers.
+Uses presets from =my-org-github-link-presets= or prompts for details.
+Transforms links like '[[file:/local/repo/file.py::term][desc]]'
+into '[[https://github.com/user/repo/blob/main/file.py#L<line>][desc]]'."
+  (interactive)
+  (let (github-base-url local-repo-root commit-ish selected-config)
+    ;; --- Configuration Selection ---
+    (if my-org-github-link-presets
+        (let* ((preset-names (mapcar #'car my-org-github-link-presets))
+               (manual-entry-str "*Enter details manually*")
+               (choices (append preset-names (list manual-entry-str)))
+               (prompt-str "Select link configuration: ")
+               (selection (completing-read prompt-str choices nil t nil nil manual-entry-str)))
+          (if (or (null selection) (string-empty-p selection) (string= selection manual-entry-str))
+              (setq selected-config nil)
+            (setq selected-config (cdr (assoc selection my-org-github-link-presets)))))
+      (setq selected-config nil))
+
+    (if selected-config
+        (progn
+          (setq local-repo-root (nth 0 selected-config)
+                github-base-url (nth 1 selected-config)
+                commit-ish (nth 2 selected-config))
+          (message "Using preset: %s" (car (rassoc selected-config my-org-github-link-presets))))
+      (progn
+        (setq github-base-url (read-string "GitHub base URL (e.g., https://github.com/user/repo): "))
+        (setq local-repo-root (read-directory-name "Local git repo root path: "))
+        (setq commit-ish (read-string "Commit/branch/tag (e.g., main or commit hash): "))))
+
+    ;; --- Input Normalization and Validation ---
+    (when local-repo-root
+      (setq local-repo-root (directory-file-name (expand-file-name local-repo-root)))
+      (unless (string-suffix-p "/" local-repo-root)
+        (setq local-repo-root (concat local-repo-root "/"))))
+
+    (when github-base-url
+      (while (string-suffix-p "/" github-base-url) ; Remove all trailing slashes
+        (setq github-base-url (substring github-base-url 0 -1))))
+
+    (if (or (null github-base-url) (string-empty-p github-base-url)
+            (null local-repo-root) (string-empty-p local-repo-root)
+            (null commit-ish) (string-empty-p commit-ish))
+        (message "Operation cancelled or invalid input provided.")
+      ;; --- Link Processing ---
+      (let ((changes-made 0)
+            (links-found 0))
+        (save-excursion ; Preserve original buffer point across the whole function
+          (goto-char (point-min))
+          (while (re-search-forward org-link-any-re nil t)
+            (let* ((match-start (match-beginning 0))
+                   (match-end (match-end 0))
+                   element type raw-path search-term description-elements)
+
+              ;; Safely parse the element by ensuring point is at its start
+              (save-excursion
+                (goto-char match-start)
+                (setq element (org-element-context)))
+
+              ;; Extract properties from the parsed element
+              (setq type (when (eq (org-element-type element) 'link)
+                           (org-element-property :type element)))
+
+              (when (and type (string= type "file")) ; Process only "file" type links
+                (setq raw-path (org-element-property :path element)
+                      search-term (org-element-property :search-option element)
+                      description-elements (org-element-contents element)) ; This should now capture the description
+
+                (setq links-found (1+ links-found))
+                (when raw-path
+                  (let ((abs-path (expand-file-name raw-path
+                                                    (if (and (boundp 'buffer-file-name) buffer-file-name)
+                                                        (file-name-directory buffer-file-name)
+                                                      default-directory))))
+                    (when (string-prefix-p local-repo-root abs-path)
+                      (let* ((relative-path (substring abs-path (length local-repo-root)))
+                             (github-file-url (format "%s/blob/%s/%s" github-base-url commit-ish relative-path))
+                             (line-number nil)
+                             (final-url github-file-url))
+
+                        (if (and search-term (file-exists-p abs-path))
+                            (with-temp-buffer
+                              (insert-file-contents abs-path)
+                              (goto-char (point-min))
+                              (condition-case err
+                                  (if (re-search-forward (regexp-quote search-term) nil t)
+                                      (setq line-number (line-number-at-pos (point))))
+                                (error (message "Search failed for '%s' in %s: %s" search-term abs-path err))))
+                          (when search-term
+                            (message "File not found or search term for: %s" abs-path)))
+
+                        (when line-number
+                          (setq final-url (format "%s#L%d" final-url line-number)))
+
+                        (let ((new-link-text
+                               (if description-elements
+                                   (format "[[%s][%s]]" final-url (org-element-interpret-data description-elements))
+                                 (format "[[%s]]" final-url))))
+                          ;; Perform replacement using original match boundaries
+                          (goto-char match-start) ; Point is currently at match-end from re-search-forward
+                          (delete-region match-start match-end)
+                          (insert new-link-text)
+                          (setq changes-made (1+ changes-made))
+                          ;; Point is now at (+ match-start (length new-link-text)).
+                          ;; re-search-forward will correctly continue from here.
+                          )))))))))) ; Close let*s and whens
+        (message "Processed %d file links. Converted %d links to GitHub URLs." links-found changes-made))))
+#+end_src
+
+#+RESULTS:
+: my-org-convert-local-links-to-github
+
 * Programming languages
 
 This section contains settings, which are related to different
