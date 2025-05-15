@@ -2415,6 +2415,25 @@ sorry, but this is ugly and distracting and >half the time not accurate):
          :cargo (:loadOutDirsFromCheck t))))
 #+end_src
 
+*IMPORTANT*: We add ~rust-analyzer~ via ~rustup~ further below in the
+script now! Under the LSP section!
+
+Set up ~eglot~ to use ~rust-analyzer~ via ~rustup~. But we can only
+add to the list once ~eglot~ has been started!
+
+#+begin_src emacs-lisp
+;;(with-eval-after-load 'eglot
+;;  (add-to-list 'eglot-server-programs
+;;               '(rust-mode . ("rustup" "run" "stable" "rust-analyzer"))))
+#+end_src
+
+#+begin_src emacs-lisp
+;;(require 'eglot)
+;;(add-to-list 'eglot-server-programs
+;;             '(rust-mode . ("rustup" "run" "stable" "rust-analyzer")))
+#+end_src
+
+
 ** Python
 
 Some sensible settings for Python. Activating python-mode per default
@@ -2549,12 +2568,15 @@ And add the ~.sage~ extension to the files that automatically load python-mode.
 Stolen from: https://gist.github.com/casouri/0ad2c6e58965f6fd2498a91fc9c66501
 See also: https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
 
+Important to add ~rust-analyzer~ in this weird way, because we use it
+via ~rustup~.
 #+begin_src emacs-lisp
+
 (use-package eglot
   :hook ((rust-mode go-mode) . eglot-ensure)
   :config
   (add-to-list 'eglot-server-programs
-               `(rust-mode . ("rust-analyzer" :initializationOptions
+               `(rust-mode . ("rustup" "run" "stable" "rust-analyzer" :initializationOptions
                               ( :procMacro (:enable t)
                                 :cargo ( :buildScripts (:enable t)
                                          :features "all"))))))
