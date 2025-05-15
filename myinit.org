@@ -2854,3 +2854,23 @@ Activate a table of contents by default:
         (toc-depth . 3)     ; Specify TOC depth (headers to include)
         ))
 #+end_src
+
+* Magit
+
+Recent magit changed the way that untracked files are shown / checked
+for:
+#+begin_src emacs-lisp
+(setq magit-status-file-list-limit 5000)
+#+end_src
+
+* TODO Consider to make
+
+#+begin_src emacs-lisp
+(setq helm-grep-file-path-style 'relative)
+#+end_src
+the default so that we see the relative path in the helm grep buffer.
+
+Ideally I'd prefer a view where the left column just shows the
+filename and at the very right edge of the buffer in each row we see
+the relative path.
+I.e. similar to how it works in the regular helm buffer selection window.
