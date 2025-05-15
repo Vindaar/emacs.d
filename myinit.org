@@ -2636,6 +2636,7 @@ org-ai / org-ai-openai.el."
                      ('openai "api.openai.com")
                      ('deepseek "api.deepseek.com")
                      ('perplexity.ai "api.perplexity.ai")
+                     ('xai "api.x.ai")                     
                      ('gemini "generativelanguage.googleapis.com"))))
     (or (auth-source-pick-first-password :host endpoint :user "gptel")
         (auth-source-pick-first-password :host endpoint :login "gptel"))))
@@ -2648,11 +2649,30 @@ org-ai / org-ai-openai.el."
 ;;   :key 'get-token-auth-source)
 
 (gptel-make-gemini "Gemini" :key 'get-gemini-api-token :stream t)
+;; Add gemini 2.0 flash
+;; https://ai.google.dev/gemini-api/docs/models/gemini#gemini-2.0-flash
+;; to gptel
 
-(setq
- gptel-model 'claude-3-5-sonnet-20241022
- gptel-backend (gptel-make-anthropic "Claude"
+;; (push 'gemini-2.0-flash-001 (gptel-backend-models (gptel-get-backend "Gemini")))
+;; (put 'gemini-2.0-flash-001 :capabilities '(tool-use json media))
+;; (put 'gemini-2.0-flash-001 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
+(push 'gemini-2.5-pro-preview-05-06 (gptel-backend-models (gptel-get-backend "Gemini")))
+(put 'gemini-2.5-pro-preview-05-06 :capabilities '(tool-use json media))
+(put 'gemini-2.5-pro-preview-05-06 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+
+(setq gptel-backend (gptel-make-anthropic "Claude"
                  :stream t :key 'get-token-auth-source))
+
+(push 'claude-3-7-sonnet-20250219 (gptel-backend-models (gptel-get-backend "Claude")))
+(put 'claude-3-7-sonnet-20250219 :capabilities '(tool-use json media reasoning))
+(put 'claude-3-7-sonnet-20250219 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+
+
+(setq gptel-model 'claude-3-7-sonnet-20250219)
+
 
 ;; The log is very useful if something goes wrong!
 (setq gptel-log-level 'info)
@@ -2674,11 +2694,47 @@ org-ai / org-ai-openai.el."
   :stream t
   :key 'gptel-deepseek-api-key
   :models '(deepseek-chat deepseek-coder deepseek-reasoner))
+(put 'deepseek-chat :capabilities '(tool-use json media))
+(put 'deepseek-reasoner :capabilities '(tool-use json media reasoning))
+(put 'deepseek-reasoner :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                      "application/pdf" "text/plain" "text/csv" "text/html"))
+
+
+(defun get-openai-api-token ()
+  (get-token-auth-source 'openai))
+
+(gptel-make-openai "OpenAI" :key 'get-openai-api-token :stream t)
+
+(setq gptel-api-key 'get-openai-api-token)
+
+
+(push 'gpt-4.1 (gptel-backend-models (gptel-get-backend "OpenAI")))
+(put 'gpt-4.1 :capabilities '(tool-use json media reasoning))
+(put 'gpt-4.1 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                            "application/pdf" "text/plain" "text/csv" "text/html"))
+
+(push 'gpt-4.1-mini (gptel-backend-models (gptel-get-backend "OpenAI")))
+(put 'gpt-4.1-mini :capabilities '(tool-use json media reasoning))
+(put 'gpt-4.1-mini :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                            "application/pdf" "text/plain" "text/csv" "text/html"))
+
+
+;; Ollama
+
+(gptel-make-ollama "Ollama"             ;Any name of your choosing
+  :host "localhost:11434"               ;Where it's running
+  :stream t                             ;Stream responses
+  :models '(gemma3:27b))          ;List of models
+
+
+(setq gptel-xai-api-key (lambda () (get-token-auth-source 'xai)))
+(gptel-make-xai "xAI"
+  :stream t :key 'gptel-xai-api-key)
 
 #+end_src
 
 #+RESULTS:
-| lambda | nil | (get-token-auth-source 'openai) |
+: #s(gptel-openai "xAI" "api.x.ai" #<subr F616e6f6e796d6f75732d6c616d626461_anonymous_lambda_30> "https" t "/v1/chat/completions" gptel-xai-api-key (grok-3-latest grok-3-fast-latest grok-3-mini-latest grok-3-mini-fast-latest grok-2-vision-1212) "https://api.x.ai/v1/chat/completions" nil nil)
 
 Add custom instructions.
 
