@@ -965,6 +965,22 @@ Setup our ~zsh~ blocks to use same syntax highlighting as ~sh~:
 (add-to-list 'org-src-lang-modes '("zsh" . sh))
 #+end_src
 
+
+Add a keybinding to fold a source block when we're inside it.
+#+begin_src emacs-lisp
+(defun my/org-fold-current-block ()
+  "Fold the current block when point is inside the block."
+  (interactive)
+  (save-excursion
+    (when (org-in-src-block-p)
+      (org-babel-goto-src-block-head)
+      (org-cycle))))
+
+;; bind a key for it. `f` for fold.
+(define-key org-mode-map (kbd "C-c f") 'my/org-fold-current-block)
+#+end_src
+
+
 ** org-ref settings
 
 Tell ~org-ref~ / ~helm-bibtex~ where our paper PDFs are and which
@@ -2140,6 +2156,19 @@ org-agenda.
 
 #+RESULTS:
 : org-capture
+
+Not directly org-capture related, but related to links, let's adjust
+how ~org-store-link~ works:
+#+begin_src emacs-lisp
+(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+#+end_src
+From the description of the variable:
+#+begin_quote
+create-if-interactive-and-no-custom-id
+      Like create-if-interactive, but do not create an ID if there is
+      a CUSTOM_ID property defined in the entry.
+#+end_quote
+
 
 And now adjust the capture templates:
 #+begin_src emacs-lisp
