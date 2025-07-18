@@ -1086,13 +1086,27 @@ and to get minted to use the monokai theme, simply add:
 #+END_EXAMPLE
 
 - [ ] Move the package import to setup file?
+
+I just <2025-07-18 Fri 12:06> switched to using ~engraved~ instead of
+~minted~. It simply uses Emacs itself to determine the colors of the
+syntax highlighting! Much more elegant design than depending on a
+crappy TeX + Python machinery.
+See the help for the variable [[help:org-latex-src-block-backend]].
+See the help here [[help:org-latex-engraved-options]] for an idea for the
+available options. 
 #+BEGIN_SRC emacs-lisp
 (require 'ox-latex)
 ;; (add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq org-latex-listings 'minted)
-(setq org-latex-minted-options
-      '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg") ("fontsize=\\footnotesize")))
+(setq org-latex-src-block-backend 'engraved)
+(setq org-latex-minted-options nil)
+;;      '(("frame" "lines") ("linenos=true") ("bgcolor=monokai_bg") ("fontsize=\\footnotesize")))
+
+;; Add line numbers. Default otherwise looks pretty good to me (for a PDF)
+(add-to-list 'org-latex-engraved-options '("linenos" . "true"))
 #+END_SRC
+
+#+RESULTS:
+: ((linenos . true) (commandchars . \\\{\}) (highlightcolor . white!95!black!80!blue) (breaklines . true) (breaksymbol . \color{white!60!black}\tiny\ensuremath{\hookrightarrow}))
 
 Now define pdflatex compilation commands used when =C-c C-e l P= is
 pressed. NOTE: if we currently use =C-c C-c= from a LaTeX buffer
