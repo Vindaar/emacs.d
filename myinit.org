@@ -924,9 +924,12 @@ Define additional org mode faces
 
 Add some files to org-agenda
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files '("~/org/journal.org" "~/org/void_settings.org"))
+(setq org-agenda-files '("~/org/journal.org" "~/org/void_settings.org" "~/org/lita/journal.org"))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
+
+#+RESULTS:
+: ((org-agenda-files :maxlevel . 6))
 
 
 The following could also be placed in the interface part, but since
@@ -2541,7 +2544,8 @@ And enable running ~rustfmt~ on save:
 
 And enable LSP using eglot.
 #+begin_src emacs-lisp
-(add-hook 'rust-mode-hook 'eglot-ensure)
+;(add-hook 'rust-mode-hook 'eglot-ensure)
+(remove-hook 'rust-mode-hook 'eglot-ensure)
 #+end_src
 
 Disable squiggly lines under what rust-analyzer considers wrong (I'm
@@ -2685,8 +2689,20 @@ Hooks and settings for Nim lang, a sweet
 ;; (remove-hook 'nim-mode-hook #'nimsuggest-mode)
 (add-hook 'nim-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'nim-mode-hook #'subword-mode)
-
+;; (add-hook 'nim-mode-hook #'eglot)
 #+END_SRC
+
+#+begin_src emacs-lisp
+;;(with-eval-after-load 'eglot
+;;  (add-to-list 'eglot-server-programs
+;;               '(nim-mode . ("nimlangserver" "--socket"))))
+;;
+;;(
+;;(add-to-list 'eglot-server-programs
+;;             '(nim-mode . ("nimlangserver")))
+;; (setq eglot-server-programs (delete '(nim-mode "nimlangserver" "--socket") eglot-server-programs))
+
+#+end_src
 
 ** Julia
 
@@ -2825,21 +2841,31 @@ org-ai / org-ai-openai.el."
 ;; (put 'gemini-2.0-flash-001 :capabilities '(tool-use json media))
 ;; (put 'gemini-2.0-flash-001 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
 ;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
-(push 'gemini-2.5-pro-preview-05-06 (gptel-backend-models (gptel-get-backend "Gemini")))
-(put 'gemini-2.5-pro-preview-05-06 :capabilities '(tool-use json media))
-(put 'gemini-2.5-pro-preview-05-06 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+(push 'gemini-2.5-pro-preview-06-05 (gptel-backend-models (gptel-get-backend "Gemini")))
+(put 'gemini-2.5-pro-preview-06-05 :capabilities '(tool-use json media))
+(put 'gemini-2.5-pro-preview-06-05 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                                 "application/pdf" "text/plain" "text/csv" "text/html"))
 
 (setq gptel-backend (gptel-make-anthropic "Claude"
                  :stream t :key 'get-token-auth-source))
 
-(push 'claude-3-7-sonnet-20250219 (gptel-backend-models (gptel-get-backend "Claude")))
-(put 'claude-3-7-sonnet-20250219 :capabilities '(tool-use json media reasoning))
-(put 'claude-3-7-sonnet-20250219 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;(push 'claude-3-7-sonnet-20250219 (gptel-backend-models (gptel-get-backend "Claude")))
+;;(put 'claude-3-7-sonnet-20250219 :capabilities '(tool-use json media reasoning))
+;;(put 'claude-3-7-sonnet-20250219 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+
+(push 'claude-sonnet-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
+(put 'claude-sonnet-4-20250514 :capabilities '(tool-use json media reasoning))
+(put 'claude-sonnet-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+
+(push 'claude-opus-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
+(put 'claude-opus-4-20250514 :capabilities '(tool-use json media reasoning))
+(put 'claude-opus-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
                                          "application/pdf" "text/plain" "text/csv" "text/html"))
 
 
-(setq gptel-model 'claude-3-7-sonnet-20250219)
+(setq gptel-model 'claude-sonnet-4-20250514)
 
 
 ;; The log is very useful if something goes wrong!
@@ -2899,10 +2925,22 @@ org-ai / org-ai-openai.el."
 (gptel-make-xai "xAI"
   :stream t :key 'gptel-xai-api-key)
 
+(push 'grok-4-0709 (gptel-backend-models (gptel-get-backend "xAI")))
+(put 'grok-4-0709 :capabilities '(tool-use json media reasoning))
+(put 'grok-4-0709 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                "application/pdf" "text/plain" "text/csv" "text/html"))
+(put 'grok-4-0709 :context-window 256000)
+(put 'grok-4-0709 :input-cost 3)
+(put 'grok-4-0709 :output-cost 15)
+
+;; Use Grok4 as default for now
+;; -> need to change default backend!
+;; (setq gptel-model 'grok-4-0709)
+
 #+end_src
 
 #+RESULTS:
-: #s(gptel-openai "xAI" "api.x.ai" #<subr F616e6f6e796d6f75732d6c616d626461_anonymous_lambda_30> "https" t "/v1/chat/completions" gptel-xai-api-key (grok-3-latest grok-3-fast-latest grok-3-mini-latest grok-3-mini-fast-latest grok-2-vision-1212) "https://api.x.ai/v1/chat/completions" nil nil)
+: 15
 
 Add custom instructions.
 
