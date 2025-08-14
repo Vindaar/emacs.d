@@ -30,4 +30,6 @@
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
 
+;; custom themes without packages
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (profiler-stop)
