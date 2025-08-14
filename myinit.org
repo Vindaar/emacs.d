@@ -2704,6 +2704,18 @@ Hooks and settings for Nim lang, a sweet
 
 #+end_src
 
+Add Nim-specific error patterns to
+~compilation-error-regexp-alist~. This makes it so that if we
+e.g. evaluate Nim in an Org buffer and get a compilation error, the
+errors are actually clickable to jump to location. This greatly
+simplifies *especially* coding in an Org buffer, where otherwise the
+line numbers are not really easily accessible.
+#+begin_src emacs-lisp
+(add-to-list 'compilation-error-regexp-alist-alist
+             '(nim "^\\(.*\\.nim\\)(\\([0-9]+\\), \\([0-9]+\\)) \\(Error\\|Warning\\|Hint\\): .*$" 1 2 3))
+(add-to-list 'compilation-error-regexp-alist 'nim)
+#+end_src
+
 ** Julia
 
 Add the standard hooks for Julia as well, a JIT compiled language,
