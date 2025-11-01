@@ -2868,18 +2868,25 @@ org-ai / org-ai-openai.el."
 ;;(put 'claude-3-7-sonnet-20250219 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
 ;;                                         "application/pdf" "text/plain" "text/csv" "text/html"))
 
-(push 'claude-sonnet-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
-(put 'claude-sonnet-4-20250514 :capabilities '(tool-use json media reasoning))
-(put 'claude-sonnet-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                                         "application/pdf" "text/plain" "text/csv" "text/html"))
-
-(push 'claude-opus-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
-(put 'claude-opus-4-20250514 :capabilities '(tool-use json media reasoning))
-(put 'claude-opus-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                                         "application/pdf" "text/plain" "text/csv" "text/html"))
-
+;; (push 'claude-sonnet-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
+;; (put 'claude-sonnet-4-20250514 :capabilities '(tool-use json media reasoning))
+;; (put 'claude-sonnet-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
+;; 
+;; (push 'claude-opus-4-20250514 (gptel-backend-models (gptel-get-backend "Claude")))
+;; (put 'claude-opus-4-20250514 :capabilities '(tool-use json media reasoning))
+;; (put 'claude-opus-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
 
 (setq gptel-model 'claude-sonnet-4-20250514)
+
+;; Add another backend for Claude models for thinking
+(gptel-make-anthropic "Claude-thinking" ;Any name you want
+  :key 'get-token-auth-source
+  :stream t
+  :models '(claude-sonnet-4-20250514 claude-opus-4-20250514 claude-opus-4-1-20250805 claude-sonnet-4-5-20250929)
+  :request-params '(:thinking (:type "enabled" :budget_tokens 2048)
+                    :max_tokens 4096))
 
 
 ;; The log is very useful if something goes wrong!
@@ -2916,15 +2923,21 @@ org-ai / org-ai-openai.el."
 (setq gptel-api-key 'get-openai-api-token)
 
 
-(push 'gpt-4.1 (gptel-backend-models (gptel-get-backend "OpenAI")))
-(put 'gpt-4.1 :capabilities '(tool-use json media reasoning))
-(put 'gpt-4.1 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                            "application/pdf" "text/plain" "text/csv" "text/html"))
-
-(push 'gpt-4.1-mini (gptel-backend-models (gptel-get-backend "OpenAI")))
-(put 'gpt-4.1-mini :capabilities '(tool-use json media reasoning))
-(put 'gpt-4.1-mini :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                            "application/pdf" "text/plain" "text/csv" "text/html"))
+;; (push 'gpt-4.1 (gptel-backend-models (gptel-get-backend "OpenAI")))
+;; (put 'gpt-4.1 :capabilities '(tool-use json media reasoning))
+;; (put 'gpt-4.1 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                             "application/pdf" "text/plain" "text/csv" "text/html"))
+;; 
+;; (push 'gpt-4.1-mini (gptel-backend-models (gptel-get-backend "OpenAI")))
+;; (put 'gpt-4.1-mini :capabilities '(tool-use json media reasoning))
+;; (put 'gpt-4.1-mini :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                             "application/pdf" "text/plain" "text/csv" "text/html"))
+;; 
+;; 
+;; (push 'gpt-5 (gptel-backend-models (gptel-get-backend "OpenAI")))
+;; (put 'gpt-5 :capabilities '(tool-use json media reasoning))
+;; (put 'gpt-5 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                             "application/pdf" "text/plain" "text/csv" "text/html"))
 
 
 ;; Ollama
@@ -2939,22 +2952,33 @@ org-ai / org-ai-openai.el."
 (gptel-make-xai "xAI"
   :stream t :key 'gptel-xai-api-key)
 
-(push 'grok-4-0709 (gptel-backend-models (gptel-get-backend "xAI")))
-(put 'grok-4-0709 :capabilities '(tool-use json media reasoning))
-(put 'grok-4-0709 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                                "application/pdf" "text/plain" "text/csv" "text/html"))
-(put 'grok-4-0709 :context-window 256000)
-(put 'grok-4-0709 :input-cost 3)
-(put 'grok-4-0709 :output-cost 15)
+;; (push 'grok-4-0709 (gptel-backend-models (gptel-get-backend "xAI")))
+;; (put 'grok-4-0709 :capabilities '(tool-use json media reasoning))
+;; (put 'grok-4-0709 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                 "application/pdf" "text/plain" "text/csv" "text/html"))
+;; (put 'grok-4-0709 :context-window 256000)
+;; (put 'grok-4-0709 :input-cost 3)
+;; (put 'grok-4-0709 :output-cost 15)
 
 ;; Use Grok4 as default for now
 ;; -> need to change default backend!
 ;; (setq gptel-model 'grok-4-0709)
 
+;; OpenRouter offers an OpenAI compatible API
+(setq gptel-openrouter-api-key (lambda () (get-token-auth-source 'openrouter)))
+
+(gptel-make-openai "OpenRouter"               ;Any name you want
+  :host "openrouter.ai"
+  :endpoint "/api/v1/chat/completions"
+  :stream t
+  :key 'gptel-openrouter-api-key ;can be a function that returns the key
+  :models '(openai/gpt-5
+            ))
+
 #+end_src
 
 #+RESULTS:
-: 15
+: #s(gptel-openai "OpenRouter" "openrouter.ai" #<subr F616e6f6e796d6f75732d6c616d626461_anonymous_lambda_20> "https" t "/api/v1/chat/completions" gptel-openrouter-api-key (openai/gpt-5) "https://openrouter.ai/api/v1/chat/completions" nil nil nil)
 
 Add custom instructions.
 
