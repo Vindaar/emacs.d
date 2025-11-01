@@ -2545,7 +2545,7 @@ And enable running ~rustfmt~ on save:
 And enable LSP using eglot.
 #+begin_src emacs-lisp
 ;(add-hook 'rust-mode-hook 'eglot-ensure)
-(remove-hook 'rust-mode-hook 'eglot-ensure)
+;(remove-hook 'rust-mode-hook 'eglot-ensure)
 #+end_src
 
 Disable squiggly lines under what rust-analyzer considers wrong (I'm
@@ -2562,7 +2562,8 @@ sorry, but this is ugly and distracting and >half the time not accurate):
       '(:rust-analyzer
         (:checkOnSave (:enable t)
          :procMacro (:enable t)
-         :cargo (:loadOutDirsFromCheck t))))
+         :cargo (:loadOutDirsFromCheck t
+                 :features "all"))))
 #+end_src
 
 *IMPORTANT*: We add ~rust-analyzer~ via ~rustup~ further below in the
@@ -2832,7 +2833,8 @@ org-ai / org-ai-openai.el."
                      ('openai "api.openai.com")
                      ('deepseek "api.deepseek.com")
                      ('perplexity.ai "api.perplexity.ai")
-                     ('xai "api.x.ai")                     
+                     ('xai "api.x.ai")
+                     ('openrouter "openrouter.ai")
                      ('gemini "generativelanguage.googleapis.com"))))
     (or (auth-source-pick-first-password :host endpoint :user "gptel")
         (auth-source-pick-first-password :host endpoint :login "gptel"))))
