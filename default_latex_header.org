@@ -8,8 +8,9 @@
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{pdfpages}
 #+LATEX_HEADER: \usepackage{siunitx}
-# package that allows inserting unicode characters in math environment
-#+LATEX_HEADER: \usepackage{unicode-math}
+# package that allows inserting unicode characters in math
+# environment. Part of our default nowadays (for org latex preview)
+# #+LATEX_HEADER: \usepackage{unicode-math}
 #+LATEX_HEADER: \usepackage{amsmath}
 #+LATEX_HEADER: \usepackage{mhchem}
 # Make the default margins on export smaller
@@ -20,7 +21,8 @@
 #+LATEX_HEADER: \usepackage[labelformat=simple]{subcaption}
 
 # Overwrite the default text color in use for minted!
-#+LATEX_HEADER: \usepackage{minted}
+# #+LATEX_HEADER: \usepackage{minted}
+# #+LATEX_HEADER: \usepackage[outputdir=texout]{minted}
 #+LATEX_HEADER: \usepackage{xcolor}
 #+LATEX_HEADER: \definecolor{defaultMintedColor}{HTML}{808080}
 # Well, this breaks the coloring of the line numbers..........
