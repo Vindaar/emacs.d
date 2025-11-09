@@ -1479,6 +1479,243 @@ processing hooks that run before the actual export:
 #+end_src
 
 
+**** JS included in HTML export
+:PROPERTIES:
+:ID:       1dae9dc6-e28d-42ab-addd-a2ca5a4146e1
+:END:
+
+The below contains our JS code that is inserted into any HTML export
+that we do. It covers the following things:
+1. interactive functionality for our Subfigures DSL
+2. adding a hamburger menu to collapse / open the table of content on
+   mobile devices
+3. a theme switcher for dark / light theme and detection of system
+   preferences.
+
+Our Org CSS file:
+[[file:org_html_export.css]]
+includes a light theme nowadays as well as handling for mobile and the
+table of content.
+
+#+begin_src emacs-lisp
+(setq org-html-head
+      "
+<link rel='stylesheet' type='text/css' href='org_html_export.css' />
+
+<link rel='preload' as='font' type='font/woff2'
+      href='/fonts/Baskervville-VariableFont_wght.woff2' crossorigin>
+
+<script type='text/javascript'>
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set the initial width for subfigures and their images
+    document.querySelectorAll('figure.subfigure[data-width]').forEach(function(subfigure) {
+        subfigure.style.width = subfigure.getAttribute('data-width');
+    });
+
+    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
+        img.style.width = img.getAttribute('data-width');
+    });
+
+    // Event listener for images within subfigures
+    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
+        img.addEventListener('click', function() {
+            // Determine the .figure-wrapper that contains the clicked image
+            let wrapper = this.closest('.figure-wrapper');
+
+            // If found, adjust the sizes of its subfigures
+            if (wrapper) {
+                let subfigures = wrapper.querySelectorAll('figure.subfigure');
+                subfigures.forEach(subfigure => {
+                    let width = parseFloat(subfigure.getAttribute('data-width'));
+                    if (width < 50) { // Double size if less than 50%
+                        subfigure.setAttribute('data-width', (width * 2) + '%');
+                        subfigure.style.width = (width * 2) + '%';
+                    } else { // Halve size otherwise
+                        subfigure.setAttribute('data-width', (width / 2) + '%');
+                        subfigure.style.width = (width / 2) + '%';
+                    }
+                });
+            }
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var headers = document.querySelectorAll('h1 .extended, h2 .extended, h3 .extended, h4 .extended, h5 .extended, h6 .extended');
+
+    headers.forEach(function (header) {
+        var foldableHeader = header.closest('h1, h2, h3, h4, h5, h6');
+        if (foldableHeader) {
+            foldableHeader.classList.add('foldable-header');
+            var nextElement = foldableHeader.nextElementSibling;
+            var contentToFold = [];
+            while (nextElement && !nextElement.matches('h1, h2, h3, h4, h5, h6')) {
+                contentToFold.push(nextElement);
+                nextElement = nextElement.nextElementSibling;
+            }
+            contentToFold.forEach(function (element) {
+                element.classList.add('folded-content');
+            });
+
+            foldableHeader.addEventListener('click', function () {
+                contentToFold.forEach(function (element) {
+                    if (element.style.display === 'none' || element.style.display == '') {
+                        element.style.display = 'block';
+                    } else {
+                        element.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+});
+
+// Mobile TOC Toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    var tocToggle = document.getElementById('tocToggle');
+    var toc = document.getElementById('table-of-contents');
+    var backdrop = document.getElementById('tocBackdrop');
+
+    if (tocToggle && toc && backdrop) {
+        // Toggle TOC when hamburger button is clicked
+        tocToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toc.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        });
+
+        // Close TOC when backdrop is clicked
+        backdrop.addEventListener('click', function() {
+            toc.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+
+        // Close TOC when a link inside it is clicked
+        var tocLinks = toc.querySelectorAll('a');
+        tocLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                toc.classList.remove('active');
+                backdrop.classList.remove('active');
+            });
+        });
+
+        // Close TOC with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && toc.classList.contains('active')) {
+                toc.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+    }
+});
+
+// Theme Selector functionality with system preference detection
+document.addEventListener('DOMContentLoaded', function() {
+    var themeSelector = document.getElementById('themeSelector');
+    var body = document.body;
+
+    // Define available themes
+    var themes = {
+        'light': { name: 'Light', type: 'light', class: 'light-theme' },
+        'monokai-soft': { name: 'Monokai (Soft Text)', type: 'dark', class: 'theme-monokai-soft-text' },
+        'monokai-neutral-toc': { name: 'Monokai (Neutral TOC)', type: 'dark', class: 'theme-monokai-white-text' },
+        'dracula': { name: 'Dracula', type: 'dark', class: 'theme-dracula' },
+        'gruvbox': { name: 'Gruvbox', type: 'dark', class: 'theme-gruvbox' },
+        'tokyo-night': { name: 'Tokyo Night', type: 'dark', class: 'theme-tokyo-night' },
+        'andromeda': { name: 'Andromeda', type: 'dark', class: 'theme-andromeda' },
+    };
+
+    // Get system preference
+    var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var systemThemeType = systemPrefersDark ? 'dark' : 'light';
+
+    // Populate dropdown - system-preferred type first
+    var darkThemes = [];
+    var lightThemes = [];
+
+    for (var key in themes) {
+        var theme = themes[key];
+        if (theme.type === 'dark') {
+            darkThemes.push({ key: key, theme: theme });
+        } else {
+            lightThemes.push({ key: key, theme: theme });
+        }
+    }
+
+    var orderedThemes = systemPrefersDark ? darkThemes.concat(lightThemes) : lightThemes.concat(darkThemes);
+
+    orderedThemes.forEach(function(item) {
+        var option = document.createElement('option');
+        option.value = item.key;
+        option.textContent = item.theme.name + ' (' + item.theme.type + ')';
+        themeSelector.appendChild(option);
+    });
+
+    // Check for saved theme preference
+    var savedTheme = localStorage.getItem('theme');
+    var currentTheme = savedTheme || (systemPrefersDark ? 'monokai-soft' : 'light');
+
+    // Apply current theme
+    function applyTheme(themeKey) {
+        // Remove all theme classes
+        for (var key in themes) {
+            body.classList.remove(themes[key].class);
+        }
+        // Add selected theme class
+        if (themes[themeKey]) {
+            body.classList.add(themes[themeKey].class);
+        }
+    }
+
+    applyTheme(currentTheme);
+    themeSelector.value = currentTheme;
+
+    // Handle theme changes
+    if (themeSelector) {
+        themeSelector.addEventListener('change', function() {
+            var selectedTheme = this.value;
+            applyTheme(selectedTheme);
+            localStorage.setItem('theme', selectedTheme);
+            console.log('Switched to theme:', themes[selectedTheme].name);
+        });
+    }
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        // Only auto-switch if user hasn't manually set a preference
+        if (!localStorage.getItem('theme')) {
+            var newTheme = e.matches ? 'monokai-soft' : 'light';
+            applyTheme(newTheme);
+            themeSelector.value = newTheme;
+            console.log('System switched to', e.matches ? 'dark' : 'light', 'theme');
+        }
+    });
+});
+
+</script>
+")
+#+end_src
+
+
+**** Add ToC and theme selector to ~<body>~
+
+Now we modify the ~<body>~ of each HTML we generate to include a
+reference to our theme selector and ToC hamburger menu.
+
+#+begin_src emacs-lisp
+(setq org-html-preamble t)
+(setq org-html-preamble-format
+      '(("en" "
+<button class=\"toc-toggle\" id=\"tocToggle\" aria-label=\"Toggle table of contents\">☰</button>
+<div class=\"theme-selector-wrapper\">
+  <select class=\"theme-selector\" id=\"themeSelector\" aria-label=\"Select theme\">
+    <!-- Options populated by JavaScript -->
+  </select>
+</div>
+<div class=\"toc-backdrop\" id=\"tocBackdrop\"></div>
+")))
+#+end_src
 
 *** Subfigure DSL 
 
@@ -1930,79 +2167,11 @@ top-to-bottom):
 - The second event listener sets foldable sections (i.e. ~:extented:~
   blocks in an Org file) such that they are folded by default, but
   become visible upon a click on the title.
-#+begin_src emacs-lisp
-(setq org-html-head
-      "
-<link rel='stylesheet' type='text/css' href='org_html_export.css' />
-<script type='text/javascript'>
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Set the initial width for subfigures and their images
-    document.querySelectorAll('figure.subfigure[data-width]').forEach(function(subfigure) {
-        subfigure.style.width = subfigure.getAttribute('data-width');
-    });
-
-    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
-        img.style.width = img.getAttribute('data-width');
-    });
-
-    // Event listener for images within subfigures
-    document.querySelectorAll('figure.subfigure img[data-width]').forEach(function(img) {
-        img.addEventListener('click', function() {
-            // Determine the .figure-wrapper that contains the clicked image
-            let wrapper = this.closest('.figure-wrapper');
-
-            // If found, adjust the sizes of its subfigures
-            if (wrapper) {
-                let subfigures = wrapper.querySelectorAll('figure.subfigure');
-                subfigures.forEach(subfigure => {
-                    let width = parseFloat(subfigure.getAttribute('data-width'));
-                    if (width < 50) { // Double size if less than 50%
-                        subfigure.setAttribute('data-width', (width * 2) + '%');
-                        subfigure.style.width = (width * 2) + '%';
-                    } else { // Halve size otherwise
-                        subfigure.setAttribute('data-width', (width / 2) + '%');
-                        subfigure.style.width = (width / 2) + '%';
-                    }
-                });
-            }
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    var headers = document.querySelectorAll('h1 .extended, h2 .extended, h3 .extended, h4 .extended, h5 .extended, h6 .extended');
-
-    headers.forEach(function (header) {
-        var foldableHeader = header.closest('h1, h2, h3, h4, h5, h6');
-        if (foldableHeader) {
-            foldableHeader.classList.add('foldable-header');
-            var nextElement = foldableHeader.nextElementSibling;
-            var contentToFold = [];
-            while (nextElement && !nextElement.matches('h1, h2, h3, h4, h5, h6')) {
-                contentToFold.push(nextElement);
-                nextElement = nextElement.nextElementSibling;
-            }
-            contentToFold.forEach(function (element) {
-                element.classList.add('folded-content');
-            });
-
-            foldableHeader.addEventListener('click', function () {
-                contentToFold.forEach(function (element) {
-                    if (element.style.display === 'none' || element.style.display == '') {
-                        element.style.display = 'block';
-                    } else {
-                        element.style.display = 'none';
-                    }
-                });
-            });
-        }
-    });
-});
-
-</script>
-")
-#+end_src
+*UPDATE* <2025-11-09 Sun 12:51>:
+The actual JS code inserted into ~org-html-head~ is done in sec. [[id:1dae9dc6-e28d-42ab-addd-a2ca5a4146e1][JS included in HTML export]]
+above, because we also include other JS code into our HTML export now.
+  
 
 **** Handling the subfigure DSL together with ~org-ref~
 
@@ -2097,6 +2266,58 @@ The idea is that we:
 #+begin_src emacs-lisp
 (advice-add 'org-ref-process-buffer :around #'org-html-subfigure-dsl-process)
 #+end_src
+
+
+*** Export with relative links
+
+When exporting to HTML in particular (but also other backends) things
+like ~attachment:~ are going to be inserted as absolute paths. When
+publishing HTML pages that's a bit annoying. There is no built in
+option to change this. For regular links there is
+~org-link-file-path-type~, but that does nothing for attachments.
+
+Googling revealed:
+https://emacs.stackexchange.com/questions/82326/when-exporting-to-html-how-to-make-org-attach-links-relative-instead-absolute
+
+Apparently the correct solution is to use ~org-publish~. Guess I need
+to investigate that, but for the moment, we are going with modifying
+the export code:
+#+begin_src emacs-lisp
+(defun org-attach-expand (file &optional convert-to-relative)
+  "Return the full path to the current entry's attachment file FILE.
+ Basically, this adds the path to the attachment directory. If optional
+ argument `convert-to-relative' is non-nil, then return path relative to
+ `default-directory'."
+  (let ((filepath (expand-file-name file (org-attach-dir))))
+    (if convert-to-relative
+        (dired-make-relative filepath)
+      filepath)))
+
+(defun org-attach-expand-links (_)
+  "Expand links in current buffer.
+It is meant to be added to `org-export-before-parsing-hook'."
+  (save-excursion
+    (while (re-search-forward "attachment:" nil t)
+      (let ((link (org-element-context)))
+  (when (and (org-element-type-p link 'link)
+         (string-equal "attachment"
+               (org-element-property :type link)))
+    (let* ((description (and (org-element-contents-begin link)
+                 (buffer-substring-no-properties
+                  (org-element-contents-begin link)
+                  (org-element-contents-end link))))
+       (file (org-element-property :path link))
+       (new-link (org-link-make-string
+              ;; only difference is the following two lines
+              ;; (concat "file:" (org-attach-expand file))
+              (concat "file:" (org-attach-expand file 'convert-to-relative))
+              description)))
+      (goto-char (org-element-end link))
+      (skip-chars-backward " \t")
+      (delete-region (org-element-begin link) (point))
+      (insert new-link)))))))
+#+end_src
+
 
 
 ** Org theming
