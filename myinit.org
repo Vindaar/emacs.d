@@ -3326,6 +3326,25 @@ This command does the reverse of `fill-region'."
 #+RESULTS:
 : unfill-region
 
+#+begin_src emacs-lisp
+(defun unix-timestamp-to-org-date (&optional replace)
+  "Convert Unix timestamp under point to Org date.
+With prefix arg, replace the timestamp in-place."
+  (interactive "P")
+  (let ((bounds (bounds-of-thing-at-point 'number)))
+    (if (not bounds)
+        (message "No number under point")
+      (let* ((timestamp (string-to-number 
+                         (buffer-substring (car bounds) (cdr bounds))))
+             (time (seconds-to-time timestamp))
+             (org-date (format-time-string "<%Y-%m-%d %a %H:%M>" time)))
+        (if replace
+            (progn
+              (delete-region (car bounds) (cdr bounds))
+              (insert org-date))
+          (message "%s" org-date))))))
+#+end_src
+
 * Casual
 
 Transient interfaces for a variety of packages
