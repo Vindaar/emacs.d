@@ -3447,4 +3447,22 @@ the default so that we see the relative path in the helm grep buffer.
 Ideally I'd prefer a view where the left column just shows the
 filename and at the very right edge of the buffer in each row we see
 the relative path.
-I.e. similar to how it works in the regular helm buffer selection window.
+I.e. similar to how it works in the regular helm buffer selection
+window.
+
+* GDB
+
+Let's slightly adjust our GDB settings.
+
+#+begin_src emacs-lisp
+(setq gdb-many-windows t ;; use default layout with different buffers
+      gdb-show-main t    ;; jump to main function on launch
+      ; gdb-use-separate-io-buffer t  ;; separate IO buffer for GDB and program
+      gdb-restore-window-configuration-after-quit t) ;; restore window config we had before launching gdb
+
+(gud-tooltip-mode 1)     ;; shows values of variables when hovering with mouse
+(setq compilation-scroll-output t) 
+#+end_src
+
+#+RESULTS:
+: t
