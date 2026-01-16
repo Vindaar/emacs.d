@@ -64,6 +64,7 @@ them:
                     helm-org-rifle
                     ;;dumb-jump
                     casual
+                    magit-lfs
                     ))
 #+END_SRC
 
@@ -3427,6 +3428,13 @@ Recent magit changed the way that untracked files are shown / checked
 for:
 #+begin_src emacs-lisp
 (setq magit-status-file-list-limit 5000)
+#+end_src
+
+Set up ~magit-lfs~:
+#+begin_src emacs-lisp
+(use-package magit-lfs
+  :after magit
+  :ensure t)
 #+end_src
 
 * TODO Consider to make
