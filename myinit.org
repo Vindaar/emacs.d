@@ -894,7 +894,8 @@ Load source code support for org mode for some so far used languages.
    (python . t)
    (C . t)
    (shell . t)
-   (nim . t)))
+   (nim . t)
+   (nimony . t)))
 #+END_SRC
 
 Fontify source blocks (enable syntax highlighting of source code)
