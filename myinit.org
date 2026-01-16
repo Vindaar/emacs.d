@@ -984,6 +984,32 @@ Add a keybinding to fold a source block when we're inside it.
 #+end_src
 
 
+Set keybindings for ~org-move-item-up~ and down as well as
+~org-move-subtree-up~ and down, depending on whether we are at a
+subtree heading or an item:
+#+begin_src emacs-lisp
+(defun my/org-move-up (arg)
+  "Move subtree up if point is on a heading, otherwise move current item up.
+With prefix ARG, pass it through."
+  (interactive "p")
+  (if (org-at-heading-p)
+      (org-move-subtree-up arg)
+    (org-move-item-up)))
+
+(defun my/org-move-down (arg)
+  "Move subtree down if point is on a heading, otherwise move current item down."
+  (interactive "p")
+  (if (org-at-heading-p)
+      (org-move-subtree-down arg)
+    (org-move-item-down)))
+
+(define-key org-mode-map (kbd "M-p") 'my/org-move-up)
+(define-key org-mode-map (kbd "M-n") 'my/org-move-down)
+#+end_src
+
+#+RESULTS:
+: my/org-move-down
+
 ** org-ref settings
 
 Tell ~org-ref~ / ~helm-bibtex~ where our paper PDFs are and which
