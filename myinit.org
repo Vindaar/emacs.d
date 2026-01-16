@@ -3103,13 +3103,21 @@ org-ai / org-ai-openai.el."
 ;; (put 'gemini-2.0-flash-001 :capabilities '(tool-use json media))
 ;; (put 'gemini-2.0-flash-001 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
 ;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
-(push 'gemini-2.5-pro-preview-06-05 (gptel-backend-models (gptel-get-backend "Gemini")))
-(put 'gemini-2.5-pro-preview-06-05 :capabilities '(tool-use json media))
-(put 'gemini-2.5-pro-preview-06-05 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
-                                                 "application/pdf" "text/plain" "text/csv" "text/html"))
+;;(push 'gemini-2.5-pro-preview-06-05 (gptel-backend-models (gptel-get-backend "Gemini")))
+;;(put 'gemini-2.5-pro-preview-06-05 :capabilities '(tool-use json media))
+;;(put 'gemini-2.5-pro-preview-06-05 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+;;                                                 "application/pdf" "text/plain" "text/csv" "text/html"))
 
-(setq gptel-backend (gptel-make-anthropic "Claude"
-                 :stream t :key 'get-token-auth-source))
+(push 'gemini-3-pro-preview (gptel-backend-models (gptel-get-backend "Gemini")))
+(put 'gemini-3-pro-preview :capabilities '(tool-use json media))
+(put 'gemini-3-pro-preview :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                         "application/pdf" "text/plain" "text/csv" "text/html"))
+(put 'gemini-3-pro-preview :context-window 1000000)
+(put 'gemini-3-pro-preview :input-cost 2)
+(put 'gemini-3-pro-preview :output-cost 12)
+
+(gptel-make-anthropic "Claude"
+  :stream t :key 'get-token-auth-source)
 
 ;;(push 'claude-3-7-sonnet-20250219 (gptel-backend-models (gptel-get-backend "Claude")))
 ;;(put 'claude-3-7-sonnet-20250219 :capabilities '(tool-use json media reasoning))
@@ -3126,15 +3134,15 @@ org-ai / org-ai-openai.el."
 ;; (put 'claude-opus-4-20250514 :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
 ;;                                          "application/pdf" "text/plain" "text/csv" "text/html"))
 
-(setq gptel-model 'claude-sonnet-4-20250514)
+(setq gptel-model 'claude-sonnet-4-5-20250929)
 
 ;; Add another backend for Claude models for thinking
-(gptel-make-anthropic "Claude-thinking" ;Any name you want
+(setq gptel-backend (gptel-make-anthropic "Claude-thinking" ;Any name you want
   :key 'get-token-auth-source
   :stream t
   :models '(claude-sonnet-4-20250514 claude-opus-4-20250514 claude-opus-4-1-20250805 claude-sonnet-4-5-20250929)
   :request-params '(:thinking (:type "enabled" :budget_tokens 2048)
-                    :max_tokens 4096))
+                    :max_tokens 4096)))
 
 
 ;; The log is very useful if something goes wrong!
@@ -3207,6 +3215,15 @@ org-ai / org-ai-openai.el."
 ;; (put 'grok-4-0709 :context-window 256000)
 ;; (put 'grok-4-0709 :input-cost 3)
 ;; (put 'grok-4-0709 :output-cost 15)
+
+(push 'grok-4-1-fast-reasoning (gptel-backend-models (gptel-get-backend "xAI")))
+(put 'grok-4-1-fast-reasoning :capabilities '(tool-use json media reasoning))
+(put 'grok-4-1-fast-reasoning :mime-types '("image/png" "image/jpeg" "image/webp" "image/heic" "image/heif"
+                                "application/pdf" "text/plain" "text/csv" "text/html"))
+(put 'grok-4-1-fast-reasoning :context-window 2000000)
+(put 'grok-4-1-fast-reasoning :input-cost 0.2)
+(put 'grok-4-1-fast-reasoning :output-cost 0.5)
+
 
 ;; Use Grok4 as default for now
 ;; -> need to change default backend!
